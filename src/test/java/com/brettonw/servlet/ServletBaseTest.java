@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 public class ServletBaseTest extends ServletBase {
 
     @Override
-    void handleCommand (String command, BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void handleCommand (String command, BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
         makeJsonResponse (response, query);
     }
 
