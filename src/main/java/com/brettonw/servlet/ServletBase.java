@@ -107,5 +107,5 @@ public abstract class ServletBase extends HttpServlet {
         }
     }
 
-    abstract void handleCommand (String command, BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException;
+    public abstract void handleCommand (String command, BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException;
 }
