@@ -1,15 +1,22 @@
-package com.brettonw.servlet;
+package com.brettonw.servlet.test;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public class TestServletInputStream extends ServletInputStream {
     private InputStream inputStream;
 
-    public void setInputStream (InputStream inputStream) {
-        this.inputStream = inputStream;
+    public TestServletInputStream (String inputString) {
+        try {
+            inputStream = new ByteArrayInputStream (inputString.getBytes(StandardCharsets.UTF_8.name ()));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace ();
+        }
     }
 
     @Override

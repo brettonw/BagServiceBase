@@ -52,13 +52,13 @@ public abstract class ServletBase extends HttpServlet {
 
 
     @Override
-    protected void doGet (HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet (HttpServletRequest request, HttpServletResponse response) throws IOException {
         BagObject query = BagObjectFrom.string (request.getQueryString (), MimeType.URL);
         handleRequest (query, request, response);
     }
 
     @Override
-    protected void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException {
         // extract the bag data that's been posted
         SourceAdapter sourceAdapter = new SourceAdapterReader(request.getInputStream (), MimeType.JSON);
         String requestString = sourceAdapter.getStringData ();

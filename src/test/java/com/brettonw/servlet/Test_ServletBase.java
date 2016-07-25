@@ -2,6 +2,7 @@ package com.brettonw.servlet;
 
 import com.brettonw.bag.BagObject;
 import com.brettonw.bag.BagObjectFrom;
+import com.brettonw.servlet.test.ServletTester;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +12,12 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
-public class ServletBaseTest extends ServletBase {
+public class Test_ServletBase extends ServletBase {
+    ServletTester servletTester;
+
+    public Test_ServletBase () {
+        servletTester = new ServletTester (this);
+    }
 
     @Override
     public void handleCommand (String command, BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -20,33 +26,23 @@ public class ServletBaseTest extends ServletBase {
 
     @Test
     public void testGet () throws IOException {
-        TestResponse response = new TestResponse ("test-get-response.json");
-        TestRequest request = new TestRequest ();
-        request.setQueryString ("command=hello&param1=1&param2=2");
+        File result = servletTester.get ("command=hello&param1=1&param2=2");
 
-        doGet (request, response);
-
-        File testFile = new File ("target", response.getWriterFileName ());
-        BagObject bagObject = BagObjectFrom.file (testFile);
+        BagObject bagObject = BagObjectFrom.file (result);
         assertTrue ("hello".equals (bagObject.getString ("command")));
         assertTrue ("1".equals (bagObject.getString ("param1")));
         assertTrue ("2".equals (bagObject.getString ("param2")));
     }
     @Test
     public void testPost () throws IOException {
-        TestResponse response = new TestResponse ("test-post-response.json");
-        TestRequest request = new TestRequest ();
-        request.setQueryString ("command=goodbye&param1=1&param2=2");
+        BagObject postData = BagObjectFrom.resource (getClass (), "/testPost.json");
+        File result = servletTester.post ("command=goodbye&param1=1&param2=2", postData);
 
-        doPost (request, response);
-
-        File testFile = new File ("target", response.getWriterFileName ());
-        BagObject bagObject = BagObjectFrom.file (testFile);
+        BagObject bagObject = BagObjectFrom.file (result);
         assertTrue ("goodbye".equals (bagObject.getString ("command")));
         assertTrue ("1".equals (bagObject.getString ("param1")));
         assertTrue ("2".equals (bagObject.getString ("param2")));
         assertTrue (bagObject.has (POST_DATA_KEY));
-        BagObject testPost = BagObjectFrom.resource (getClass (), "/testPost.json");
-        assertTrue (bagObject.getBagObject (POST_DATA_KEY).equals (testPost));
+        assertTrue (bagObject.getBagObject (POST_DATA_KEY).equals (postData));
     }
 }

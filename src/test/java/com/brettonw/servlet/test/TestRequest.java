@@ -1,4 +1,6 @@
-package com.brettonw.servlet;
+package com.brettonw.servlet.test;
+
+import com.brettonw.bag.Bag;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -11,9 +13,18 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
-class TestRequest implements HttpServletRequest {
-
+public class TestRequest implements HttpServletRequest {
     private String queryString;
+    private Bag postData;
+
+    public TestRequest (String queryString) {
+        this (queryString, null);
+    }
+
+    public TestRequest (String queryString, Bag postData) {
+        this.queryString = queryString;
+        this.postData = postData;
+    }
 
     @Override
     public String getAuthType () {
@@ -212,9 +223,7 @@ class TestRequest implements HttpServletRequest {
 
     @Override
     public ServletInputStream getInputStream () throws IOException {
-        TestServletInputStream sis = new TestServletInputStream ();
-        sis.setInputStream (TestServletInputStream.class.getResourceAsStream ("/testPost.json"));
-        return sis;
+        return new TestServletInputStream (postData.toString ());
     }
 
     @Override
@@ -360,9 +369,5 @@ class TestRequest implements HttpServletRequest {
     @Override
     public DispatcherType getDispatcherType () {
         return null;
-    }
-
-    public void setQueryString (String queryString) {
-        this.queryString = queryString;
     }
 }
