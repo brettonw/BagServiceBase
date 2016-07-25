@@ -3,7 +3,7 @@
 
   <groupId>com.brettonw</groupId>
   <artifactId>servlet-base</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
 
   <packaging>jar</packaging>
 
@@ -28,7 +28,7 @@
     <connection>scm:git:git@github.com:brettonw/ServletBase.git</connection>
     <developerConnection>scm:git:git@github.com:brettonw/ServletBase.git</developerConnection>
     <url>git@github.com:brettonw/ServletBase.git</url>
-    <tag>HEAD</tag>
+    <tag>servlet-base-1.0.1</tag>
   </scm>
 
   <properties>
