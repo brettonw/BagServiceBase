@@ -10,6 +10,20 @@ import java.util.Collection;
 import java.util.Locale;
 
 class TestResponse implements HttpServletResponse {
+    private String writerFileName;
+
+    public TestResponse (String writerFileName) {
+        this.writerFileName = writerFileName;
+    }
+
+    public void setWriterFileName (String writerFileName) {
+        this.writerFileName = writerFileName;
+    }
+
+    public String getWriterFileName () {
+        return writerFileName;
+    }
+
     @Override
     public String getCharacterEncoding () {
         return null;
@@ -57,7 +71,7 @@ class TestResponse implements HttpServletResponse {
 
     @Override
     public PrintWriter getWriter () throws IOException {
-        File testFile = new File ("target", "test-response.json");
+        File testFile = new File ("target", writerFileName);
         PrintWriter printWriter = new PrintWriter (testFile);
         return printWriter;
     }

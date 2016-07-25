@@ -15,19 +15,38 @@ public class ServletBaseTest extends ServletBase {
 
     @Override
     void handleCommand (String command, BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        makeErrorResponse (query, response, "test");
+        makeJsonResponse (response, query);
     }
 
     @Test
-    public void testServletBase () throws IOException {
-        TestResponse response = new TestResponse ();
+    public void testGet () throws IOException {
+        TestResponse response = new TestResponse ("test-get-response.json");
         TestRequest request = new TestRequest ();
-        request.setQueryString ("command=hello&param1=1param2=2");
+        request.setQueryString ("command=hello&param1=1&param2=2");
 
         doGet (request, response);
 
-        File testFile = new File ("target", "test-response.json");
+        File testFile = new File ("target", response.getWriterFileName ());
         BagObject bagObject = BagObjectFrom.file (testFile);
         assertTrue ("hello".equals (bagObject.getString ("command")));
+        assertTrue ("1".equals (bagObject.getString ("param1")));
+        assertTrue ("2".equals (bagObject.getString ("param2")));
+    }
+    @Test
+    public void testPost () throws IOException {
+        TestResponse response = new TestResponse ("test-post-response.json");
+        TestRequest request = new TestRequest ();
+        request.setQueryString ("command=goodbye&param1=1&param2=2");
+
+        doPost (request, response);
+
+        File testFile = new File ("target", response.getWriterFileName ());
+        BagObject bagObject = BagObjectFrom.file (testFile);
+        assertTrue ("goodbye".equals (bagObject.getString ("command")));
+        assertTrue ("1".equals (bagObject.getString ("param1")));
+        assertTrue ("2".equals (bagObject.getString ("param2")));
+        assertTrue (bagObject.has (POST_DATA_KEY));
+        BagObject testPost = BagObjectFrom.resource (getClass (), "/testPost.json");
+        assertTrue (bagObject.getBagObject (POST_DATA_KEY).equals (testPost));
     }
 }

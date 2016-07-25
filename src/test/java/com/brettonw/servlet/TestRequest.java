@@ -212,7 +212,8 @@ class TestRequest implements HttpServletRequest {
 
     @Override
     public ServletInputStream getInputStream () throws IOException {
-        ServletInputStream sis = new TestServletInputStream ();
+        TestServletInputStream sis = new TestServletInputStream ();
+        sis.setInputStream (TestServletInputStream.class.getResourceAsStream ("/testPost.json"));
         return sis;
     }
 

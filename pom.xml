@@ -9,7 +9,7 @@
 
   <name>Servlet Base</name>
   <description>ServletBase provides a base implementation for a JSON request/response server.</description>
-  <url>http://brettonw.com?github/bag/</url>
+  <url>http://brettonw.com?github/servlet-base/</url>
   <licenses>
     <license>
       <name>MIT License</name>
