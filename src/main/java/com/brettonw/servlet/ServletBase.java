@@ -19,6 +19,9 @@ public abstract class ServletBase extends HttpServlet {
     private static final Logger log = LogManager.getLogger (ServletBase.class);
 
     public static final String STATUS_KEY = "status";
+    public static final String OK_KEY = "ok";
+    public static final String QUERY_KEY = "query";
+    public static final String RESPONSE_KEY = "response";
     public static final String ERROR_KEY = "error";
     public static final String SERVLET_KEY = "servlet";
     public static final String COMMAND_KEY = "command";
@@ -92,8 +95,16 @@ public abstract class ServletBase extends HttpServlet {
         makeResponse ("text/html", response, html);
     }
 
+    public void makeSuccessResponse (BagObject query, HttpServletResponse response, Bag bag) throws IOException {
+        makeJsonResponse (response, new BagObject ()
+                .put (QUERY_KEY, query)
+                .put (STATUS_KEY, OK_KEY)
+                .put (RESPONSE_KEY, bag));
+    }
+
     public void makeErrorResponse (BagObject query, HttpServletResponse response, String error) throws IOException {
-        makeJsonResponse (response, query
+        makeJsonResponse (response, new BagObject ()
+                .put (QUERY_KEY, query)
                 .put (STATUS_KEY, ERROR_KEY)
                 .put (ERROR_KEY, error));
     }
