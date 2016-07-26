@@ -101,6 +101,7 @@ public abstract class ServletBase extends HttpServlet {
     private void handleRequest (BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String command = query.getString (COMMAND_KEY);
         if (command != null) {
+            log.debug ("Command: " + command);
             handleCommand (command, query, request, response);
         } else {
             makeErrorResponse (query, response, "Missing: " + COMMAND_KEY);
