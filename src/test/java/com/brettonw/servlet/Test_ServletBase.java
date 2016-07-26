@@ -46,9 +46,15 @@ public class Test_ServletBase extends ServletBase {
                 .put ("param1", 1)
                 .put ("param2", 2);
         BagObject postData = BagObjectFrom.resource (getClass (), "/testPost.json");
-        BagObject bagObject = servletTester.bagObjectFromPost (query, postData);
-        assertGet (bagObject, query);
-        assertTrue (bagObject.getBagObject (QUERY_KEY).has (POST_DATA_KEY));
-        assertTrue (bagObject.getBagObject (QUERY_KEY).getBagObject (POST_DATA_KEY).equals (postData));
+        BagObject response = servletTester.bagObjectFromPost (query, postData);
+        assertGet (response, query);
+        assertTrue (response.getBagObject (QUERY_KEY).has (POST_DATA_KEY));
+        assertTrue (response.getBagObject (QUERY_KEY).getBagObject (POST_DATA_KEY).equals (postData));
+    }
+
+    @Test
+    public void testEmptyRequest () throws IOException {
+        BagObject response = servletTester.bagObjectFromGet ("");
+        assertTrue (response.getString (STATUS_KEY).equals (ERROR_KEY));
     }
 }

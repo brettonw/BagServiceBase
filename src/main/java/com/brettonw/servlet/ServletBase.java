@@ -56,7 +56,7 @@ public abstract class ServletBase extends HttpServlet {
 
     @Override
     public void doGet (HttpServletRequest request, HttpServletResponse response) throws IOException {
-        BagObject query = BagObjectFrom.string (request.getQueryString (), MimeType.URL);
+        BagObject query = BagObjectFrom.string (request.getQueryString (), MimeType.URL, () -> new BagObject ());
         handleRequest (query, request, response);
     }
 
