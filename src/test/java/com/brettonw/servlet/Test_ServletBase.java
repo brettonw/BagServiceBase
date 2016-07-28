@@ -56,5 +56,6 @@ public class Test_ServletBase extends ServletBase {
     public void testEmptyRequest () throws IOException {
         BagObject response = servletTester.bagObjectFromGet ("");
         assertTrue (response.getString (STATUS_KEY).equals (ERROR_KEY));
+        assertTrue (response.getString (ERROR_KEY).equals ("Missing: '" + COMMAND_KEY + "'"));
     }
 }

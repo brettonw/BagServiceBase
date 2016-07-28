@@ -109,13 +109,17 @@ public abstract class ServletBase extends HttpServlet {
                 .put (ERROR_KEY, error));
     }
 
+    public void makeMissingParameterResponse (BagObject query, HttpServletResponse response, String missingParameter) throws IOException {
+        makeErrorResponse (query, response, "Missing: '" + missingParameter + "'");
+    }
+
     private void handleRequest (BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String command = query.getString (COMMAND_KEY);
         if (command != null) {
             log.debug ("Command: " + command);
             handleCommand (command, query, request, response);
         } else {
-            makeErrorResponse (query, response, "Missing: " + COMMAND_KEY);
+            makeMissingParameterResponse (query, response, COMMAND_KEY);
         }
     }
 
