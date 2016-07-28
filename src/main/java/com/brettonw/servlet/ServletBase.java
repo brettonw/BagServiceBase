@@ -102,26 +102,36 @@ public abstract class ServletBase extends HttpServlet {
                 .put (RESPONSE_KEY, bag));
     }
 
-    public void makeErrorResponse (BagObject query, HttpServletResponse response, String error) throws IOException {
+    public void makeErrorResponse (BagObject query, HttpServletResponse response, BagArray errors) throws IOException {
         makeJsonResponse (response, new BagObject ()
                 .put (QUERY_KEY, query)
                 .put (STATUS_KEY, ERROR_KEY)
-                .put (ERROR_KEY, error));
+                .put (ERROR_KEY, errors));
     }
 
-    public void makeMissingParameterResponse (BagObject query, HttpServletResponse response, String missingParameter) throws IOException {
-        makeErrorResponse (query, response, "Missing: '" + missingParameter + "'");
+    public void makeErrorResponse (BagObject query, HttpServletResponse response, String error) throws IOException {
+        makeErrorResponse (query, response, new BagArray ().add (error));
+    }
+
+    public boolean hasRequiredParameters (BagObject query, HttpServletResponse response, String... queryFields) throws IOException {
+        BagArray missingFields = new BagArray (queryFields.length);
+        for (String queryField : queryFields) {
+            if (! query.has (queryField)) {
+                missingFields.add ("Missing: '" + queryField + "'");
+            }
+        }
+        if (missingFields.getCount () > 0) {
+            makeErrorResponse (query, response, missingFields);
+            return false;
+        }
+        return true;
     }
 
     private void handleRequest (BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String command = query.getString (COMMAND_KEY);
-        if (command != null) {
-            log.debug ("Command: " + command);
-            handleCommand (command, query, request, response);
-        } else {
-            makeMissingParameterResponse (query, response, COMMAND_KEY);
+        if (hasRequiredParameters (query, response, COMMAND_KEY)) {
+            handleCommand (query, request, response);
         }
     }
 
-    public abstract void handleCommand (String command, BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException;
+    public abstract void handleCommand (BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException;
 }

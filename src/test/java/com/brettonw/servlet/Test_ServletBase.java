@@ -1,9 +1,6 @@
 package com.brettonw.servlet;
 
-import com.brettonw.bag.BagObject;
-import com.brettonw.bag.BagObjectFrom;
-import com.brettonw.bag.SelectKey;
-import com.brettonw.bag.SelectType;
+import com.brettonw.bag.*;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +17,7 @@ public class Test_ServletBase extends ServletBase {
     }
 
     @Override
-    public void handleCommand (String command, BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void handleCommand (BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
         makeSuccessResponse (query, response, new BagObject ().put ("testing", "123"));
     }
 
@@ -56,6 +53,6 @@ public class Test_ServletBase extends ServletBase {
     public void testEmptyRequest () throws IOException {
         BagObject response = servletTester.bagObjectFromGet ("");
         assertTrue (response.getString (STATUS_KEY).equals (ERROR_KEY));
-        assertTrue (response.getString (ERROR_KEY).equals ("Missing: '" + COMMAND_KEY + "'"));
+        assertTrue (response.getString (Key.cat (ERROR_KEY, 0)).equals ("Missing: '" + COMMAND_KEY + "'"));
     }
 }
