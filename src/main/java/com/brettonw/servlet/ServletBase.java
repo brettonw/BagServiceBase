@@ -26,6 +26,8 @@ public abstract class ServletBase extends HttpServlet {
     public static final String SERVLET_KEY = "servlet";
     public static final String COMMAND_KEY = "command";
     public static final String POST_DATA_KEY = "post-data";
+    public static final String CONTENT_TYPE_KEY = "Content-Type";
+    public static final String UTF_8 = StandardCharsets.UTF_8.name ();
 
     private static ServletContext context;
 
@@ -62,14 +64,26 @@ public abstract class ServletBase extends HttpServlet {
 
     @Override
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // get the request data type, then tease out the response type (use a default if it's not present) and the
+        // charset (if given, otherwise default to UTF-8, because that's what it will be in Java)
+        String mimeType = MimeType.DEFAULT;
+        String contentTypeHeader = request.getHeader (CONTENT_TYPE_KEY);
+        if (contentTypeHeader != null) {
+            String[] contentType = contentTypeHeader.replace (" ", "").split (";");
+            mimeType = contentType[0];
+            log.debug ("'Content-Type' is (" + mimeType + ")");
+        } else {
+            log.warn ("'Content-Type' is not set by the requestor, using default (" + mimeType + ")");
+        }
+
         // extract the bag data that's been posted
-        SourceAdapter sourceAdapter = new SourceAdapterReader(request.getInputStream (), MimeType.JSON);
+        SourceAdapter sourceAdapter = new SourceAdapterReader(request.getInputStream (), mimeType);
         String requestString = sourceAdapter.getStringData ();
-        Bag postData = BagObjectFrom.string (requestString);
+        Bag postData = BagObjectFrom.string (requestString, mimeType);
         if (postData == null) postData = BagArrayFrom.string (requestString);
 
         // handle the query part normally, but add the post data to it
-        BagObject query = BagObjectFrom.string (request.getQueryString (), MimeType.URL)
+        BagObject query = BagObjectFrom.string (request.getQueryString (), MimeType.URL, () -> new BagObject ())
                 .put (POST_DATA_KEY, postData);
         handleRequest (query, request, response);
     }
