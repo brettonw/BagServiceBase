@@ -1,0 +1,20 @@
+{
+  "help": {
+    "required": [],
+    "description": "Get the API description"
+  },
+  "hello": {
+    "required": [
+      "param1",
+      "param2"
+    ],
+    "description": "Say Hello"
+  },
+  "goodbye": {
+    "required": [
+      "param1",
+      "param2"
+    ],
+    "description": "Say Goodbye"
+  }
+}

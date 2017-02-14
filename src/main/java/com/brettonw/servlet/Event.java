@@ -73,4 +73,8 @@ public class Event {
         }
         return true;
     }
+
+    public boolean hasRequiredParameters (BagArray requiredParameters) throws IOException {
+        return (requiredParameters != null) ? hasRequiredParameters (requiredParameters.toArray (String.class)) : true;
+    }
 }

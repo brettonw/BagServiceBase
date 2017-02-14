@@ -41,12 +41,19 @@ public class Base extends HttpServlet {
 
     private final Map<String, Handler<Event>> handlers;
     protected Handler<Event> defaultHandler;
+    protected BagObject apiSchema;
 
     protected Base () {
         handlers = new HashMap<> ();
         defaultHandler = event -> {
             event.error ("Unhandled event");
         };
+
+        // try to load the schema, give a default HELP handler
+        apiSchema = BagObjectFrom.resource (Base.class, "/api.json");
+        if (apiSchema != null) {
+            onEvent (HELP, event -> event.ok (apiSchema));
+        }
     }
 
     @Override
@@ -91,13 +98,20 @@ public class Base extends HttpServlet {
     }
 
     private void handleRequest (BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // create the event object around the request parameters, and validate that it is
+        // a known event
         Event event = new Event (query, request, response);
-        if (event.hasRequiredParameters (COMMAND)) {
-            Handler<Event> handler = handlers.get (query.getString (COMMAND));
-            if (handler != null) {
-                handler.handle (event);
-            } else {
-                defaultHandler.handle (event);
+        if (event.hasRequiredParameters (EVENT)) {
+            // get the name, and try to validate the event against the schema if we have one
+            String eventName = query.getString (EVENT);
+            if ((apiSchema == null) || event.hasRequiredParameters (apiSchema.getBagArray (Key.cat (eventName, REQUIRED)))) {
+                // get the handler, and try to take care of business...
+                Handler<Event> handler = handlers.get (eventName);
+                if (handler != null) {
+                    handler.handle (event);
+                } else {
+                    defaultHandler.handle (event);
+                }
             }
         }
     }

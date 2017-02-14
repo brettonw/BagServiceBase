@@ -26,7 +26,7 @@ public class Test_Base extends Base {
     @Test
     public void testGet () throws IOException {
         BagObject query = new BagObject ()
-                .put (COMMAND, "hello")
+                .put (EVENT, "hello")
                 .put ("param1", 1)
                 .put ("param2", 2);
         assertGet (servletTester.bagObjectFromGet (query), query);
@@ -35,7 +35,7 @@ public class Test_Base extends Base {
     @Test
     public void testPost () throws IOException {
         BagObject query = new BagObject ()
-                .put (COMMAND, "goodbye")
+                .put (EVENT, "goodbye")
                 .put ("param1", 1)
                 .put ("param2", 2);
         BagObject postData = BagObjectFrom.resource (getClass (), "/testPost.json");
@@ -49,15 +49,35 @@ public class Test_Base extends Base {
     public void testEmptyRequest () throws IOException {
         BagObject response = servletTester.bagObjectFromGet ("");
         assertTrue (response.getString (STATUS).equals (ERROR));
-        assertTrue (response.getString (Key.cat (ERROR, 0)).equals ("Missing: '" + COMMAND + "'"));
+        assertTrue (response.getString (Key.cat (ERROR, 0)).equals ("Missing: '" + EVENT + "'"));
+    }
+
+    @Test
+    public void testHelp () throws IOException {
+        BagObject query = new BagObject ()
+                .put (EVENT, "help")
+                .put ("param1", 1)
+                .put ("param2", 2);
+        BagObject response = servletTester.bagObjectFromGet (query);
+        assertTrue (response.getString (STATUS).equals (OK));
+        assertTrue (response.getBagObject (RESPONSE).equals (BagObjectFrom.resource (Test_Base.class, "/api.json")));
     }
 
     @Test
     public void testBadGet () throws IOException {
         BagObject query = new BagObject ()
-                .put (COMMAND, "help")
+                .put (EVENT, "halp")
                 .put ("param1", 1)
                 .put ("param2", 2);
+        assertTrue (servletTester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
+    }
+
+    @Test
+    public void testBadParameters () throws IOException {
+        BagObject query = new BagObject ()
+                .put (EVENT, "hello")
+                .put ("param1", 1)
+                .put ("param3", 3);
         assertTrue (servletTester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
     }
 }

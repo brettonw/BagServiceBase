@@ -7,7 +7,12 @@ public class Keys {
     public static final String RESPONSE = "response";
     public static final String ERROR = "error";
     public static final String SERVLET = "servlet";
-    public static final String COMMAND = "command";
+    public static final String EVENT = "event";
     public static final String POST_DATA = "post-data";
     public static final String CONTENT_TYPE = "Content-Type";
+
+    // from schema validation
+    public static final String HELP = "help";
+    public static final String REQUIRED = "required";
+    public static final String DESCRIPTION = "description";
 }
