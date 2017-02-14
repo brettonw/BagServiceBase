@@ -108,6 +108,7 @@ public class Base extends HttpServlet {
                 // get the handler, and try to take care of business...
                 Handler<Event> handler = handlers.get (eventName);
                 if (handler != null) {
+                    log.info (eventName);
                     handler.handle (event);
                 } else {
                     defaultHandler.handle (event);
