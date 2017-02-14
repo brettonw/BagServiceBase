@@ -12,6 +12,8 @@ public class Keys {
     public static final String CONTENT_TYPE = "Content-Type";
 
     // from schema validation
+    public static final String VERSION = "version";
+    public static final String UNKNOWN = "unknown";
     public static final String HELP = "help";
     public static final String REQUIRED = "required";
     public static final String DESCRIPTION = "description";

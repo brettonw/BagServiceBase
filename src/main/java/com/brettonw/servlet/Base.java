@@ -49,6 +49,12 @@ public class Base extends HttpServlet {
             event.error ("Unhandled event: '" + event.getEventName () + "'");
         };
 
+        // add a version handler
+        onEvent (VERSION, event-> {
+            String version = getClass ().getPackage ().getImplementationVersion ();
+            event.ok (BagObject.open (VERSION, (version != null) ? version : UNKNOWN));
+        });
+
         // try to load the schema, give a default HELP handler
         apiSchema = BagObjectFrom.resource (Base.class, "/api.json");
         if (apiSchema != null) {
