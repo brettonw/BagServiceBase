@@ -46,7 +46,7 @@ public class Base extends HttpServlet {
     protected Base () {
         handlers = new HashMap<> ();
         defaultHandler = event -> {
-            event.error ("Unhandled event");
+            event.error ("Unhandled event: '" + event.getEventName () + "'");
         };
 
         // try to load the schema, give a default HELP handler
@@ -103,7 +103,7 @@ public class Base extends HttpServlet {
         Event event = new Event (query, request, response);
         if (event.hasRequiredParameters (EVENT)) {
             // get the name, and try to validate the event against the schema if we have one
-            String eventName = query.getString (EVENT);
+            String eventName = event.getEventName ();
             if ((apiSchema == null) || event.hasRequiredParameters (apiSchema.getBagArray (Key.cat (eventName, REQUIRED)))) {
                 // get the handler, and try to take care of business...
                 Handler<Event> handler = handlers.get (eventName);

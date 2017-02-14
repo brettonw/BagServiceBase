@@ -6,6 +6,8 @@ import com.brettonw.bag.BagObject;
 import com.brettonw.bag.formats.MimeType;
 import lombok.NonNull;
 import lombok.Value;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,9 +19,15 @@ import static com.brettonw.servlet.Keys.*;
 
 @Value
 public class Event {
+    private static final Logger log = LogManager.getLogger (Event.class);
+
     @NonNull private final BagObject query;
     @NonNull private final HttpServletRequest request;
     @NonNull private final HttpServletResponse response;
+
+    public String getEventName () {
+        return query.getString (EVENT);
+    }
 
     public void respond (String mimeType, String responseText) throws IOException {
         // set the response types
@@ -50,6 +58,12 @@ public class Event {
     }
 
     public void error (BagArray errors) throws IOException {
+        // log the errors
+        for (int i = 0, end = errors.getCount (); i < end; ++i) {
+            log.error (errors.getString (i));
+        }
+
+        // and respond to the end user...
         respondJson (new BagObject ()
                 .put (QUERY, query)
                 .put (STATUS, ERROR)
@@ -57,7 +71,7 @@ public class Event {
     }
 
     public void error (String error) throws IOException {
-        error (new BagArray ().add (error));
+        error (BagArray.open (error));
     }
 
     public boolean hasRequiredParameters (String... requiredParameters) throws IOException {
