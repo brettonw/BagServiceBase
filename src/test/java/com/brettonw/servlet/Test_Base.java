@@ -13,8 +13,8 @@ public class Test_Base extends Base {
 
     public Test_Base () {
         servletTester = new ServletTester (this);
-        onEvent ("hello", event -> event.ok (new BagObject ().put ("testing", "123")));
-        onEvent ("goodbye", event -> event.ok (new BagObject ().put ("testing", "456")));
+        onEvent ("hello", event -> event.ok (BagObject.open  ("testing", "123")));
+        onEvent ("goodbye", event -> event.ok (BagObject.open  ("testing", "456")));
     }
 
     private void assertGet (BagObject bagObject, BagObject query) {
