@@ -1,6 +1,5 @@
 {
   "help": {
-    "required": [],
     "description": "Get the API description"
   },
   "hello": {
