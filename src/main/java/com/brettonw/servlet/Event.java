@@ -29,7 +29,7 @@ public class Event {
         return query.getString (EVENT);
     }
 
-    public void respond (String mimeType, String responseText) throws IOException {
+    public Event respond (String mimeType, String responseText) throws IOException {
         // set the response types
         String UTF_8 = StandardCharsets.UTF_8.name ();
         response.setContentType (mimeType + "; charset=" + UTF_8);
@@ -40,38 +40,44 @@ public class Event {
         out.println (responseText);
         //out.flush ();
         out.close ();
+
+        return this;
     }
 
-    public void respondJson (Bag bag) throws IOException {
-        respond (MimeType.JSON, bag.toString (MimeType.JSON));
+    public Event respondJson (Bag bag) throws IOException {
+        return respond (MimeType.JSON, bag.toString (MimeType.JSON));
     }
 
-    public void respondHtml (String html) throws IOException {
-        respond ("text/html", html);
+    public Event respondHtml (String html) throws IOException {
+        return respond ("text/html", html);
     }
 
-    public void ok (Bag bag) throws IOException {
-        respondJson (new BagObject ()
-                .put (QUERY, query)
+    public Event ok (Bag bag) throws IOException {
+        return respondJson (BagObject
+                .open (QUERY, query)
                 .put (STATUS, OK)
                 .put (RESPONSE, bag));
     }
 
-    public void error (BagArray errors) throws IOException {
+    public Event ok () throws IOException {
+        return ok (null);
+    }
+
+    public Event error (BagArray errors) throws IOException {
         // log the errors
         for (int i = 0, end = errors.getCount (); i < end; ++i) {
             log.error (errors.getString (i));
         }
 
         // and respond to the end user...
-        respondJson (new BagObject ()
-                .put (QUERY, query)
+        return respondJson (BagObject
+                .open (QUERY, query)
                 .put (STATUS, ERROR)
                 .put (ERROR, errors));
     }
 
-    public void error (String error) throws IOException {
-        error (BagArray.open (error));
+    public Event error (String error) throws IOException {
+        return error (BagArray.open (error));
     }
 
     public boolean hasRequiredParameters (String... requiredParameters) throws IOException {

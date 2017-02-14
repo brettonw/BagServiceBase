@@ -8,13 +8,19 @@ import java.io.IOException;
 import static com.brettonw.servlet.Keys.*;
 import static org.junit.Assert.assertTrue;
 
-public class Test_Base extends Base {
+public class Base_Test extends Base {
     ServletTester servletTester;
 
-    public Test_Base () {
+    public Base_Test () {
         servletTester = new ServletTester (this);
         onEvent ("hello", event -> event.ok (BagObject.open  ("testing", "123")));
-        onEvent ("goodbye", event -> event.ok (BagObject.open  ("testing", "456")));
+        onEvent ("goodbye", event -> {
+            assertTrue (event.getQuery () != null);
+            assertTrue (event.getRequest () != null);
+            assertTrue (event.getResponse () != null);
+            event.ok (BagObject.open ("testing", "456"));
+        });
+        onEvent ("ok", event -> event.ok ());
     }
 
     private void assertGet (BagObject bagObject, BagObject query) {
@@ -29,6 +35,12 @@ public class Test_Base extends Base {
                 .open (EVENT, "hello")
                 .put ("param1", 1)
                 .put ("param2", 2);
+        assertGet (servletTester.bagObjectFromGet (query), query);
+    }
+
+    @Test
+    public void testGetOk () throws IOException {
+        BagObject query = BagObject.open (EVENT, "ok");
         assertGet (servletTester.bagObjectFromGet (query), query);
     }
 
@@ -60,7 +72,7 @@ public class Test_Base extends Base {
                 .put ("param2", 2);
         BagObject response = servletTester.bagObjectFromGet (query);
         assertTrue (response.getString (STATUS).equals (OK));
-        assertTrue (response.getBagObject (RESPONSE).equals (BagObjectFrom.resource (Test_Base.class, "/api.json")));
+        assertTrue (response.getBagObject (RESPONSE).equals (BagObjectFrom.resource (Base_Test.class, "/api.json")));
     }
 
     @Test
