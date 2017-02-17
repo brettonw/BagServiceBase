@@ -5,9 +5,7 @@ import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +37,10 @@ public class Base extends HttpServlet {
         return null;
     }
 
+    public static Base get () {
+        return (Base) getAttribute (SERVLET);
+    }
+
     private final Map<String, Handler<Event>> handlers;
     protected Handler<Event> defaultHandler;
     protected BagObject apiSchema;
@@ -51,8 +53,11 @@ public class Base extends HttpServlet {
 
         // add a version handler
         onEvent (VERSION, event-> {
-            String version = getClass ().getPackage ().getImplementationVersion ();
-            event.ok (BagObject.open (VERSION, (version != null) ? version : UNKNOWN));
+            String name = Base.class.getPackage ().getImplementationTitle ();
+            String version = Base.class.getPackage ().getImplementationVersion ();
+            event.ok (BagObject
+                    .open (VERSION, (version != null) ? version : UNKNOWN)
+            );
         });
 
         // try to load the schema, give a default HELP handler
@@ -64,11 +69,11 @@ public class Base extends HttpServlet {
 
     @Override
     public void init (ServletConfig config) throws ServletException {
+        log.debug (config.getServletName ());
         super.init (config);
         context = config.getServletContext ();
         setAttribute (SERVLET, this);
     }
-
 
     @Override
     public void doGet (HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -126,5 +131,11 @@ public class Base extends HttpServlet {
     public Base onEvent (String name, Handler<Event> handler) {
         handlers.put (name, handler);
         return this;
+    }
+
+    public void onStart () {
+    }
+
+    public void onStop () {
     }
 }
