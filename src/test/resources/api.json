@@ -1,7 +1,7 @@
 {
     "version": {"description": "Return the build version for the current WAR."},
     "help": {"description": "Get the API description."},
-    "ok": {"decsription":"Ok."},
+    "ok": {"description":"Ok."},
     "hello": {
         "required": ["param1", "param2"],
         "description": "Say Hello."
