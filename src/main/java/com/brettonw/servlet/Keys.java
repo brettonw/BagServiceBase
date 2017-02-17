@@ -11,7 +11,9 @@ public class Keys {
     public static final String POST_DATA = "post-data";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String VERSION = "version";
-    public static final String NAME = "name";
+    public static final String POM_VERSION = "pom-version";
+    public static final String POM_NAME = "pom-name";
+    public static final String DISPLAY_NAME = "display-name";
     public static final String HELP = "help";
     public static final String REQUIRED = "required";
     public static final String DESCRIPTION = "description";
