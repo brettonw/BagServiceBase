@@ -37,10 +37,6 @@ public class Base extends HttpServlet {
         return null;
     }
 
-    public static Base get () {
-        return (Base) getAttribute (SERVLET);
-    }
-
     private final Map<String, Handler<Event>> handlers;
     protected Handler<Event> defaultHandler;
     protected BagObject apiSchema;
@@ -53,10 +49,10 @@ public class Base extends HttpServlet {
 
         // add a version handler
         onEvent (VERSION, event-> {
-            String name = Base.class.getPackage ().getImplementationTitle ();
             String version = Base.class.getPackage ().getImplementationVersion ();
             event.ok (BagObject
-                    .open (VERSION, (version != null) ? version : UNKNOWN)
+                    .open (VERSION, version)
+                    .put (NAME, context.getServletContextName ())
             );
         });
 
@@ -69,10 +65,17 @@ public class Base extends HttpServlet {
 
     @Override
     public void init (ServletConfig config) throws ServletException {
-        log.debug (config.getServletName ());
         super.init (config);
         context = config.getServletContext ();
+        log.debug ("STARTING " + context.getServletContextName ());
+        super.init (config);
         setAttribute (SERVLET, this);
+    }
+
+    @Override
+    public void destroy () {
+        super.destroy ();
+        log.debug (context.getServletContextName () + " DESTROYING...");
     }
 
     @Override
@@ -131,11 +134,5 @@ public class Base extends HttpServlet {
     public Base onEvent (String name, Handler<Event> handler) {
         handlers.put (name, handler);
         return this;
-    }
-
-    public void onStart () {
-    }
-
-    public void onStop () {
     }
 }
