@@ -55,10 +55,28 @@ public class Base extends HttpServlet {
                 )
         );
 
+        // add a default MULTIPLE handler
+        onEvent (MULTIPLE, event -> {
+                    BagArray eventsArray = event.getQuery ().getBagArray (POST_DATA);
+                    if (eventsArray != null) {
+                        int eventCount = eventsArray.getCount ();
+
+                        // need to open the response writer and manually write back some results?
+
+                        for (int i = 0; i < eventCount; ++i) {
+                            BagObject query = eventsArray.getBagObject (i);
+                            handleRequest (query, event.getRequest (), event.getResponse ());
+                        }
+                    } else {
+                        event.error ("No messages found (expected an array in " + POST_DATA + ")");
+                    }
+                }
+        );
+
         // try to load the schema, give a default HELP handler if we succeed
         apiSchema = BagObjectFrom.resource (getClass (), "/api.json");
         if (apiSchema != null) {
-            onEvent (HELP, event -> event.ok (this.apiSchema));
+            onEvent (HELP, event -> event.ok (apiSchema));
         }
     }
 

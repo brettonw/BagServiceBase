@@ -17,4 +17,5 @@ public class Keys {
     public static final String HELP = "help";
     public static final String REQUIRED = "required";
     public static final String DESCRIPTION = "description";
+    public static final String MULTIPLE = "multiple";
 }

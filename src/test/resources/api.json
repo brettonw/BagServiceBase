@@ -1,6 +1,10 @@
 {
     "version": {"description": "Return the build version for the current WAR."},
     "help": {"description": "Get the API description."},
+    "multiple": {
+        "required": ["postData"],
+        "description": "Handle multiple events in array format."
+    },
     "hello": {
         "required": ["param1", "param2"],
         "description": "Say Hello."
