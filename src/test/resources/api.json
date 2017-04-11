@@ -12,5 +12,6 @@
     "goodbye": {
         "required": ["param1", "param2"],
         "description": "Say Goodbye."
-    }
+    },
+    "ok": {"description": "return ok."}
 }

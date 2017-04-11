@@ -47,36 +47,19 @@ public class Base extends HttpServlet {
             event.error ("Unhandled event: '" + event.getEventName () + "'");
         };
 
-        // add a default VERSION handler
-        onEvent (VERSION, event -> event.ok (BagObject
-                        .open (POM_VERSION, getClass ().getPackage ().getImplementationVersion ())
-                        .put (POM_NAME, getClass ().getPackage ().getImplementationTitle ())
-                        .put (DISPLAY_NAME, context.getServletContextName ())
-                )
-        );
-
-        // add a default MULTIPLE handler
-        onEvent (MULTIPLE, event -> {
-                    BagArray eventsArray = event.getQuery ().getBagArray (POST_DATA);
-                    if (eventsArray != null) {
-                        int eventCount = eventsArray.getCount ();
-
-                        // need to open the response writer and manually write back some results?
-
-                        for (int i = 0; i < eventCount; ++i) {
-                            BagObject query = eventsArray.getBagObject (i);
-                            handleRequest (query, event.getRequest (), event.getResponse ());
-                        }
-                    } else {
-                        event.error ("No messages found (expected an array in " + POST_DATA + ")");
-                    }
-                }
-        );
-
-        // try to load the schema, give a default HELP handler if we succeed
+        // try to load the schema and wire up the handlers
         apiSchema = BagObjectFrom.resource (getClass (), "/api.json");
         if (apiSchema != null) {
-            onEvent (HELP, event -> event.ok (apiSchema));
+            // autowire... loop over the elements in the schema, looking for functions that match
+            // the signature, "handleEventXXX"
+            String[] events = apiSchema.keys ();
+            for (String event : events) {
+                try {
+                    handlers.put (event, new HandlerAutoWired (event, this));
+                } catch (NoSuchMethodException exception) {
+                    log.error ("Auto-wire failed for '" + event + "'", exception);
+                }
+            }
         }
     }
 
@@ -151,5 +134,33 @@ public class Base extends HttpServlet {
     public Base onEvent (String name, Handler<Event> handler) {
         handlers.put (name, handler);
         return this;
+    }
+
+    // default handlers
+    public void handleEventHelp (Event event) throws IOException {
+        event.ok (apiSchema);
+    }
+
+    public void handleEventVersion (Event event) throws IOException {
+         event.ok (BagObject
+                .open (POM_VERSION, getClass ().getPackage ().getImplementationVersion ())
+                .put (POM_NAME, getClass ().getPackage ().getImplementationTitle ())
+                .put (DISPLAY_NAME, context.getServletContextName ())
+         );
+    }
+    public void handleEventMultiple (Event event) throws IOException {
+        BagArray eventsArray = event.getQuery ().getBagArray (POST_DATA);
+        if (eventsArray != null) {
+            int eventCount = eventsArray.getCount ();
+
+            // need to open the response writer and manually write back some results?
+
+            for (int i = 0; i < eventCount; ++i) {
+                BagObject query = eventsArray.getBagObject (i);
+                handleRequest (query, event.getRequest (), event.getResponse ());
+            }
+        } else {
+            event.error ("No messages found (expected an array in " + POST_DATA + ")");
+        }
     }
 }

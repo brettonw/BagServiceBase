@@ -13,14 +13,21 @@ public class Base_Test extends Base {
 
     public Base_Test () {
         servletTester = new ServletTester (this);
-        onEvent ("hello", event -> event.ok (BagObject.open  ("testing", "123")));
-        onEvent ("goodbye", event -> {
-            assertTrue (event.getQuery () != null);
-            assertTrue (event.getRequest () != null);
-            assertTrue (event.getResponse () != null);
-            event.ok (BagObject.open ("testing", "456"));
-        });
-        onEvent ("ok", event -> event.ok ());
+    }
+
+    public void handleEventHello (Event event) throws IOException {
+        event.ok (BagObject.open  ("testing", "123"));
+    }
+
+    public void handleEventGoodbye (Event event) throws IOException {
+        assertTrue (event.getQuery () != null);
+        assertTrue (event.getRequest () != null);
+        assertTrue (event.getResponse () != null);
+        event.ok (BagObject.open ("testing", "456"));
+    }
+
+    public void handleEventOk (Event event) throws IOException {
+        event.ok ();
     }
 
     private void assertGet (BagObject bagObject, BagObject query) {
