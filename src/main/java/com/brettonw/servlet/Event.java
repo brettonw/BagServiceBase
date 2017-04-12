@@ -3,7 +3,6 @@ package com.brettonw.servlet;
 import com.brettonw.bag.Bag;
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
-import com.brettonw.bag.Key;
 import com.brettonw.bag.formats.MimeType;
 import lombok.NonNull;
 import lombok.Value;
@@ -79,41 +78,5 @@ public class Event {
 
     public Event error (String error) throws IOException {
         return error (BagArray.open (error));
-    }
-
-    public boolean hasValidParameters (BagObject parameterSpecification) throws IOException {
-        BagArray errors = new BagArray ();
-
-        // loop over the query parameters to be sure they are all valid
-        String[] queryParameters = query.keys ();
-        for (int i = 0; i < queryParameters.length; ++i) {
-            String queryParameter = queryParameters[i];
-            if (!queryParameter.equals (EVENT)) {
-                if ((parameterSpecification == null) || (! parameterSpecification.has (queryParameter))) {
-                    errors.add ("Unknown parameter supplied: '" + queryParameter + "'");
-                }
-            }
-        }
-
-        // loop over the parameter specification to be sure all of the required ones are present
-        if (parameterSpecification != null) {
-            String[] expectedParameters = parameterSpecification.keys ();
-            for (int i = 0; i < expectedParameters.length; ++i) {
-                String expectedParameter = expectedParameters[i];
-                if (parameterSpecification.getBoolean (Key.cat (expectedParameter, REQUIRED), () -> false)) {
-                    if (!query.has (expectedParameter)) {
-                        errors.add ("Missing parameter: '" + expectedParameter + "'");
-                    }
-                }
-            }
-        }
-
-        // check to see if there are problems
-        if (errors.getCount () > 0) {
-            error (errors);
-            return false;
-        }
-
-        return true;
     }
 }

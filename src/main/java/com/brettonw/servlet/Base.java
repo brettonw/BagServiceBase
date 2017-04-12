@@ -38,26 +38,17 @@ public class Base extends HttpServlet {
     }
 
     private final Map<String, Handler<Event>> handlers;
-    protected Handler<Event> defaultHandler;
     protected BagObject apiSchema;
 
     protected Base () {
-        handlers = new HashMap<> ();
-        defaultHandler = event -> {
-            event.error ("Unhandled event: '" + event.getEventName () + "'");
-        };
-
         // try to load the schema and wire up the handlers
+        handlers = new HashMap<> ();
         if ((apiSchema = BagObjectFrom.resource (getClass (), "/api.json")) != null) {
             // autowire... loop over the elements in the schema, looking for functions that match
             // the signature, "handleEventXXX"
             String[] events = apiSchema.keys ();
             for (String event : events) {
-                try {
-                    handlers.put (event, new HandlerAutoWired (event, this));
-                } catch (NoSuchMethodException exception) {
-                    log.error ("Auto-wire failed for '" + event + "'", exception);
-                }
+                install (event);
             }
         } else {
             log.error ("Failed to load servlet schema");
@@ -118,27 +109,71 @@ public class Base extends HttpServlet {
             // create the event object around the request parameters, and validate that it is
             // a known event
             String eventName = event.getEventName ();
-            if ((eventName != null) && (apiSchema.has (eventName))) {
-                // try to validate the event against the schema
-                if (event.hasValidParameters (apiSchema.getBagObject (Key.cat (eventName, PARAMETERS)))) {
-                    // get the handler, and try to take care of business...
-                    Handler<Event> handler = handlers.get (eventName);
-                    if (handler != null) {
-                        log.info (eventName);
-                        handler.handle (event);
-                        return;
+            if (eventName != null)  {
+                if (apiSchema.has (eventName)) {
+                    // validate the query parameters
+                    BagObject parameterSpecification = apiSchema.getBagObject (Key.cat (eventName, PARAMETERS));
+                    BagArray validationErrors = new BagArray ();
+
+                    // loop over the query parameters to be sure they are all valid
+                    String[] queryParameters = query.keys ();
+                    for (int i = 0; i < queryParameters.length; ++i) {
+                        String queryParameter = queryParameters[i];
+                        if (!queryParameter.equals (EVENT)) {
+                            if ((parameterSpecification == null) || (!parameterSpecification.has (queryParameter))) {
+                                validationErrors.add ("Unknown parameter supplied: '" + queryParameter + "'");
+                            }
+                        }
                     }
+
+                    // loop over the parameter specification to be sure all of the required ones are present
+                    if (parameterSpecification != null) {
+                        String[] expectedParameters = parameterSpecification.keys ();
+                        for (int i = 0; i < expectedParameters.length; ++i) {
+                            String expectedParameter = expectedParameters[i];
+                            if (parameterSpecification.getBoolean (Key.cat (expectedParameter, REQUIRED), () -> false)) {
+                                if (!query.has (expectedParameter)) {
+                                    validationErrors.add ("Missing required parameter: '" + expectedParameter + "'");
+                                }
+                            }
+                        }
+                    }
+
+                    // check to see if there are validation problems
+                    if (validationErrors.getCount () == 0) {
+                        // get the handler, and try to take care of business...
+                        Handler<Event> handler = handlers.get (eventName);
+                        if (handler != null) {
+                            log.info (eventName);
+                            handler.handle (event);
+                        } else {
+                            event.error ("No handler installed for '" + EVENT + "' (" + eventName + ")");
+                        }
+                    } else {
+                        event.error (validationErrors);
+                    }
+                } else {
+                    event.error ("Missing schema for '" + EVENT + "' (" + eventName + ")");
                 }
             } else {
                 event.error ("Missing: '" + EVENT + "'");
-                return;
             }
+        } else {
+            event.error ("Missing schema");
         }
-        defaultHandler.handle (event);
     }
 
-    public Base onEvent (String name, Handler<Event> handler) {
-        handlers.put (name, handler);
+    public Base onEvent (String event, Handler<Event> handler) {
+        handlers.put (event, handler);
+        return this;
+    }
+
+    public Base install (String event) {
+        try {
+            onEvent (event, new HandlerAutoInstalled (event, this));
+        } catch (NoSuchMethodException exception) {
+            log.error ("Install '" + EVENT + "' failed for (" + event + ")", exception);
+        }
         return this;
     }
 

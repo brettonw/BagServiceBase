@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class HandlerAutoWired implements Handler<Event> {
+public class HandlerAutoInstalled implements Handler<Event> {
     private static final Logger log = LogManager.getLogger (Base.class);
 
     private Object container;
     private Method method;
 
-    public HandlerAutoWired (String event, Object container) throws NoSuchMethodException {
+    public HandlerAutoInstalled (String event, Object container) throws NoSuchMethodException {
         this.container = container;
         // construct the event handler name, and look it up in the container
         String eventHandlerName = "handleEvent" + event.substring (0, 1).toUpperCase () + event.substring (1);

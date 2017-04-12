@@ -37,6 +37,11 @@ public class Base_Test extends Base {
     }
 
     @Test
+    public void testBadInstall () {
+        install ("JUNK");
+    }
+
+    @Test
     public void testGet () throws IOException {
         BagObject query = BagObject
                 .open (EVENT, "hello")
