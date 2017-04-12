@@ -41,7 +41,7 @@ public class Base extends HttpServlet {
         return null;
     }
 
-    private final Map<String, Handler<Event>> handlers;
+    private final Map<String, Handler> handlers;
     protected BagObject apiSchema;
 
     protected Base () {
@@ -50,9 +50,9 @@ public class Base extends HttpServlet {
         if ((apiSchema = BagObjectFrom.resource (getClass (), "/api.json")) != null) {
             // autowire... loop over the elements in the schema, looking for functions that match
             // the signature, "handleEventXXX"
-            String[] events = apiSchema.keys ();
-            for (String event : events) {
-                autoInstall (event);
+            String[] eventNames = apiSchema.keys ();
+            for (String eventName : eventNames) {
+                install (eventName);
             }
         } else {
             log.error ("Failed to load servlet schema");
@@ -158,10 +158,9 @@ public class Base extends HttpServlet {
                     // if the validation passed
                     if (validationErrors.getCount () == 0) {
                         // get the handler, and try to take care of business...
-                        Handler<Event> handler = handlers.get (eventName);
+                        Handler handler = handlers.get (eventName);
                         if (handler != null) {
                             // finally, do your business
-                            log.info (eventName);
                             handler.handle (event);
                         } else {
                             event.error ("No handler installed for '" + EVENT + "' (" + eventName + ")");
@@ -181,21 +180,23 @@ public class Base extends HttpServlet {
         return event;
     }
 
-    public Base install (String event, Handler<Event> handler) {
-        handlers.put (event, handler);
-        return this;
-    }
-
-    public Base autoInstall (String event) {
+    public boolean install (String eventName) {
         try {
-            install (event, new HandlerAutoInstall (event, this));
+            Handler handler = new Handler (eventName, this);
+            handlers.put (handler.getEventName (), handler);
+            log.info ("Installed '" + handler.getMethodName () + "'");
+            return true;
         } catch (NoSuchMethodException exception) {
-            log.error ("Install '" + EVENT + "' failed for (" + event + ")", exception);
+            log.error ("Install '" + EVENT + "' failed for (" + eventName + ")", exception);
+            return false;
         }
-        return this;
     }
 
     // default handlers
+    public void handleEventOk (Event event) {
+        event.ok ();
+    }
+
     public void handleEventHelp (Event event) {
         event.ok (apiSchema);
     }

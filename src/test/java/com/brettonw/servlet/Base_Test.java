@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import static com.brettonw.servlet.Keys.*;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class Base_Test extends Base {
     ServletTester servletTester;
@@ -30,10 +31,6 @@ public class Base_Test extends Base {
         event.ok (BagObject.open ("testing", "456"));
     }
 
-    public void handleEventOk (Event event) {
-        event.ok ();
-    }
-
     public void handleEventDashName (Event event) {
         event.ok ();
     }
@@ -53,11 +50,7 @@ public class Base_Test extends Base {
     @Test
     public void testBadInstall () {
         String event = "JUNK";
-        try {
-            install (event, new HandlerAutoInstall (event, this));
-            assertTrue ("The install should throw an exception." == null);
-        } catch (NoSuchMethodException exception) {
-        }
+        assertFalse (install ("JUNK"));
     }
 
     @Test
