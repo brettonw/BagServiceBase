@@ -5,11 +5,15 @@ import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.servlet.*;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +52,7 @@ public class Base extends HttpServlet {
             // the signature, "handleEventXXX"
             String[] events = apiSchema.keys ();
             for (String event : events) {
-                install (event);
+                autoInstall (event);
             }
         } else {
             log.error ("Failed to load servlet schema");
@@ -104,12 +108,22 @@ public class Base extends HttpServlet {
     }
 
     private void handleRequest (BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Event event = new Event (query, request, response);
+        Event event = handleEvent (query, request);
+        String UTF_8 = StandardCharsets.UTF_8.name ();
+        response.setContentType (MimeType.JSON + "; charset=" + UTF_8);
+        response.setCharacterEncoding (UTF_8);
+        PrintWriter out = response.getWriter ();
+        out.println (event.getResponse ().toString (MimeType.JSON));
+        out.close ();
+    }
+
+    private Event handleEvent (BagObject query, HttpServletRequest request) throws IOException {
+        Event event = new Event (query, request);
         if (apiSchema != null) {
             // create the event object around the request parameters, and validate that it is
             // a known event
             String eventName = event.getEventName ();
-            if (eventName != null)  {
+            if (eventName != null) {
                 if (apiSchema.has (eventName)) {
                     // validate the query parameters
                     BagObject parameterSpecification = apiSchema.getBagObject (Key.cat (eventName, PARAMETERS));
@@ -139,11 +153,12 @@ public class Base extends HttpServlet {
                         }
                     }
 
-                    // check to see if there are validation problems
+                    // if the validation passed
                     if (validationErrors.getCount () == 0) {
                         // get the handler, and try to take care of business...
                         Handler<Event> handler = handlers.get (eventName);
                         if (handler != null) {
+                            // finally, do your business
                             log.info (eventName);
                             handler.handle (event);
                         } else {
@@ -161,16 +176,17 @@ public class Base extends HttpServlet {
         } else {
             event.error ("Missing schema");
         }
+        return event;
     }
 
-    public Base onEvent (String event, Handler<Event> handler) {
+    public Base install (String event, Handler<Event> handler) {
         handlers.put (event, handler);
         return this;
     }
 
-    public Base install (String event) {
+    public Base autoInstall (String event) {
         try {
-            onEvent (event, new HandlerAutoInstalled (event, this));
+            install (event, new HandlerAutoInstall (event, this));
         } catch (NoSuchMethodException exception) {
             log.error ("Install '" + EVENT + "' failed for (" + event + ")", exception);
         }
@@ -189,19 +205,19 @@ public class Base extends HttpServlet {
                 .put (DISPLAY_NAME, context.getServletContextName ())
          );
     }
+
     public void handleEventMultiple (Event event) throws IOException {
         BagArray eventsArray = event.getQuery ().getBagArray (POST_DATA);
         if (eventsArray != null) {
             int eventCount = eventsArray.getCount ();
-
-            // need to open the response writer and manually write back some results?
-
+            BagArray results = new BagArray (eventCount);
             for (int i = 0; i < eventCount; ++i) {
-                BagObject query = eventsArray.getBagObject (i);
-                handleRequest (query, event.getRequest (), event.getResponse ());
+                Event subEvent = handleEvent (eventsArray.getBagObject (i), event.getRequest ());
+                results.add (subEvent.getResponse ());
             }
+            event.ok (results);
         } else {
-            event.error ("No messages found (expected an array in " + POST_DATA + ")");
+            event.error ("No messages found (expected an array in '" + POST_DATA + "')");
         }
     }
 }

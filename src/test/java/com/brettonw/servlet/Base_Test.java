@@ -21,8 +21,12 @@ public class Base_Test extends Base {
 
     public void handleEventGoodbye (Event event) throws IOException {
         assertTrue (event.getQuery () != null);
+        assertTrue (event.getQuery ().has (POST_DATA));
         assertTrue (event.getRequest () != null);
-        assertTrue (event.getResponse () != null);
+        if (event.getQuery ().has ("param3") && (event.getQuery ().getInteger ("param3") == 2)) {
+            // deliberately invoke a failure to test the failure handling
+            assertTrue (false);
+        }
         event.ok (BagObject.open ("testing", "456"));
     }
 
@@ -38,7 +42,7 @@ public class Base_Test extends Base {
 
     @Test
     public void testBadInstall () {
-        install ("JUNK");
+        autoInstall ("JUNK");
     }
 
     @Test
@@ -47,6 +51,9 @@ public class Base_Test extends Base {
                 .open (EVENT, "hello")
                 .put ("param1", 1)
                 .put ("param2", 2);
+        assertGet (servletTester.bagObjectFromGet (query), query);
+
+        query.put ("param3", 3);
         assertGet (servletTester.bagObjectFromGet (query), query);
     }
 
@@ -67,6 +74,16 @@ public class Base_Test extends Base {
         assertGet (response, query);
         assertTrue (response.getBagObject (QUERY).has (POST_DATA));
         assertTrue (response.getBagObject (QUERY).getBagObject (POST_DATA).equals (postData));
+
+        query.put ("param3", 3);
+        response = servletTester.bagObjectFromPost (query, postData);
+        assertGet (response, query);
+        assertTrue (response.getBagObject (QUERY).has (POST_DATA));
+        assertTrue (response.getBagObject (QUERY).getBagObject (POST_DATA).equals (postData));
+
+        query.put ("param3", 2);
+        response = servletTester.bagObjectFromPost (query, postData);
+        assertTrue (response.getString (STATUS).equals (ERROR));
     }
 
     @Test
