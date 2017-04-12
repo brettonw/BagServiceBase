@@ -48,8 +48,7 @@ public class Base extends HttpServlet {
         };
 
         // try to load the schema and wire up the handlers
-        apiSchema = BagObjectFrom.resource (getClass (), "/api.json");
-        if (apiSchema != null) {
+        if ((apiSchema = BagObjectFrom.resource (getClass (), "/api.json")) != null) {
             // autowire... loop over the elements in the schema, looking for functions that match
             // the signature, "handleEventXXX"
             String[] events = apiSchema.keys ();
@@ -60,6 +59,8 @@ public class Base extends HttpServlet {
                     log.error ("Auto-wire failed for '" + event + "'", exception);
                 }
             }
+        } else {
+            log.error ("Failed to load servlet schema");
         }
     }
 
@@ -112,23 +113,28 @@ public class Base extends HttpServlet {
     }
 
     private void handleRequest (BagObject query, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // create the event object around the request parameters, and validate that it is
-        // a known event
         Event event = new Event (query, request, response);
-        if (event.hasRequiredParameters (EVENT)) {
-            // get the name, and try to validate the event against the schema if we have one
+        if (apiSchema != null) {
+            // create the event object around the request parameters, and validate that it is
+            // a known event
             String eventName = event.getEventName ();
-            if ((apiSchema == null) || event.hasRequiredParameters (apiSchema.getBagArray (Key.cat (eventName, REQUIRED)))) {
-                // get the handler, and try to take care of business...
-                Handler<Event> handler = handlers.get (eventName);
-                if (handler != null) {
-                    log.info (eventName);
-                    handler.handle (event);
-                } else {
-                    defaultHandler.handle (event);
+            if ((eventName != null) && (apiSchema.has (eventName))) {
+                // try to validate the event against the schema
+                if (event.hasValidParameters (apiSchema.getBagObject (Key.cat (eventName, PARAMETERS)))) {
+                    // get the handler, and try to take care of business...
+                    Handler<Event> handler = handlers.get (eventName);
+                    if (handler != null) {
+                        log.info (eventName);
+                        handler.handle (event);
+                        return;
+                    }
                 }
+            } else {
+                event.error ("Missing: '" + EVENT + "'");
+                return;
             }
         }
+        defaultHandler.handle (event);
     }
 
     public Base onEvent (String name, Handler<Event> handler) {

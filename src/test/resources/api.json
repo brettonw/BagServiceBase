@@ -1,17 +1,34 @@
 {
-    "version": {"description": "Return the build version for the current WAR."},
-    "help": {"description": "Get the API description."},
+    "version": {
+        "description": "Return the build version for the current WAR."
+    },
+    "help": {
+        "description": "Get the API description."
+    },
     "multiple": {
-        "required": ["postData"],
-        "description": "Handle multiple events in array format."
+        "description": "Handle multiple events in array format.",
+        "parameters": {
+            "post-data": { "description": "An array of other events", "required": true }
+        }
     },
     "hello": {
-        "required": ["param1", "param2"],
-        "description": "Say Hello."
+        "description": "Say Hello.",
+        "parameters": {
+            "param1": { "description": "1st Parameter", "required": true },
+            "param2": { "description": "2nd Parameter", "required": true },
+            "param3": { "description": "3rd Parameter", "required": false }
+        }
     },
     "goodbye": {
-        "required": ["param1", "param2"],
-        "description": "Say Goodbye."
+        "description": "Say Goodbye.",
+        "parameters": {
+            "param1": {"description": "1st Parameter", "required": true },
+            "param2": {"description": "2nd Parameter", "required": true },
+            "param3": {"description": "3rd Parameter"},
+            "post-data": {"description": "a list of other stuff", "required": true}
+        }
     },
-    "ok": {"description": "return ok."}
+    "ok": {
+        "description": "ok."
+    }
 }

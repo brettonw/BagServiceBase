@@ -74,9 +74,7 @@ public class Base_Test extends Base {
     @Test
     public void testHelp () throws IOException {
         BagObject query = BagObject
-                .open (EVENT, "help")
-                .put ("param1", 1)
-                .put ("param2", 2);
+                .open (EVENT, "help");
         BagObject response = servletTester.bagObjectFromGet (query);
         assertTrue (response.getString (STATUS).equals (OK));
         assertTrue (response.getBagObject (RESPONSE).equals (BagObjectFrom.resource (Base_Test.class, "/api.json")));
