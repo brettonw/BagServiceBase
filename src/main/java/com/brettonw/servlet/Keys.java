@@ -15,6 +15,7 @@ public class Keys {
     public static final String POM_NAME = "pom-name";
     public static final String DISPLAY_NAME = "display-name";
     public static final String HELP = "help";
+    public static final String STRICT = "strict";
     public static final String PARAMETERS = "parameters";
     public static final String NAME = "name";
     public static final String REQUIRED = "required";

@@ -79,7 +79,10 @@ public class Base_Test extends Base {
 
     @Test
     public void testGetOk () throws IOException {
-        BagObject query = BagObject.open (EVENT, "ok");
+        BagObject query = BagObject.open (EVENT, OK);
+        assertGet (servletTester.bagObjectFromGet (query), query);
+
+        query.put ("param4", 4);
         assertGet (servletTester.bagObjectFromGet (query), query);
     }
 
@@ -101,9 +104,12 @@ public class Base_Test extends Base {
         assertTrue (response.getBagObject (QUERY).has (POST_DATA));
         assertTrue (response.getBagObject (QUERY).getBagObject (POST_DATA).equals (postData));
 
+        query.put ("param4", 4);
+        assertTrue (servletTester.bagObjectFromPost (query, postData).getString (STATUS).equals (ERROR));
+        query.remove ("param4");
+
         query.put ("param3", 2);
-        response = servletTester.bagObjectFromPost (query, postData);
-        assertTrue (response.getString (STATUS).equals (ERROR));
+        assertTrue (servletTester.bagObjectFromPost (query, postData).getString (STATUS).equals (ERROR));
     }
 
     @Test

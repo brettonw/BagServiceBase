@@ -126,15 +126,18 @@ public class Base extends HttpServlet {
                 if (apiSchema.has (eventName)) {
                     // validate the query parameters
                     BagObject parameterSpecification = apiSchema.getBagObject (Key.cat (eventName, PARAMETERS));
+                    boolean strict = apiSchema.getBoolean (Key.cat (eventName, STRICT), () -> true);
                     BagArray validationErrors = new BagArray ();
 
-                    // loop over the query parameters to be sure they are all valid
-                    String[] queryParameters = query.keys ();
-                    for (int i = 0; i < queryParameters.length; ++i) {
-                        String queryParameter = queryParameters[i];
-                        if (!queryParameter.equals (EVENT)) {
-                            if ((parameterSpecification == null) || (!parameterSpecification.has (queryParameter))) {
-                                validationErrors.add ("Unknown parameter supplied: '" + queryParameter + "'");
+                    if (strict) {
+                        // loop over the query parameters to be sure they are all valid
+                        String[] queryParameters = query.keys ();
+                        for (int i = 0; i < queryParameters.length; ++i) {
+                            String queryParameter = queryParameters[i];
+                            if (!queryParameter.equals (EVENT)) {
+                                if ((parameterSpecification == null) || (!parameterSpecification.has (queryParameter))) {
+                                    validationErrors.add ("Unknown parameter supplied: '" + queryParameter + "'");
+                                }
                             }
                         }
                     }
