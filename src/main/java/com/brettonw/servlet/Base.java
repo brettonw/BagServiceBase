@@ -64,7 +64,6 @@ public class Base extends HttpServlet {
         super.init (config);
         context = config.getServletContext ();
         log.debug ("STARTING " + context.getServletContextName ());
-        super.init (config);
         setAttribute (SERVLET, this);
     }
 

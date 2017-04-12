@@ -29,6 +29,10 @@
         }
     },
     "ok": {
-        "description": "ok."
+        "description": "Ok."
+    },
+    "nohandler": {
+        "description": "An event with no handler, passes validation, but can't be invoked."
+
     }
 }

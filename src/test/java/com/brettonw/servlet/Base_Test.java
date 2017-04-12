@@ -41,8 +41,25 @@ public class Base_Test extends Base {
     }
 
     @Test
+    public void testAttribute () {
+        assertTrue (getContext () != null);
+        assertTrue (getAttribute (SERVLET) == this);
+    }
+
+    @Test
     public void testBadInstall () {
-        autoInstall ("JUNK");
+        String event = "JUNK";
+        try {
+            install (event, new HandlerAutoInstall (event, this));
+            assertTrue ("The install should throw an exception." == null);
+        } catch (NoSuchMethodException exception) {
+        }
+    }
+
+    @Test
+    public void testMissingEvent () throws IOException {
+        BagObject query = BagObject.open (EVENT, "nohandler");
+        assertTrue (servletTester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
     }
 
     @Test
@@ -55,6 +72,9 @@ public class Base_Test extends Base {
 
         query.put ("param3", 3);
         assertGet (servletTester.bagObjectFromGet (query), query);
+
+        query.put ("param4", 4);
+        assertTrue (servletTester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
     }
 
     @Test
@@ -95,8 +115,7 @@ public class Base_Test extends Base {
 
     @Test
     public void testHelp () throws IOException {
-        BagObject query = BagObject
-                .open (EVENT, "help");
+        BagObject query = BagObject.open (EVENT, "help");
         BagObject response = servletTester.bagObjectFromGet (query);
         assertTrue (response.getString (STATUS).equals (OK));
         assertTrue (response.getBagObject (RESPONSE).equals (BagObjectFrom.resource (Base_Test.class, "/api.json")));
@@ -122,10 +141,18 @@ public class Base_Test extends Base {
 
     @Test
     public void testVersion () throws IOException {
-        BagObject query = BagObject.open(EVENT, VERSION);
+        BagObject query = BagObject.open (EVENT, VERSION);
         BagObject response = servletTester.bagObjectFromGet (query);
         //assertTrue (response.getString (Key.cat (RESPONSE, VERSION)).equals (UNKNOWN));
         //assertTrue (response.getString (Key.cat (RESPONSE, NAME)).equals ("ServletTester"));
         assertTrue (response.getString (STATUS).equals (OK));
+    }
+
+    @Test
+    public void testMultiple () throws IOException {
+        BagObject query = BagObject.open (EVENT, MULTIPLE);
+        BagArray postData = BagArray.open (BagObject.open (EVENT, VERSION)).add (BagObject.open (EVENT, "help"));
+        assertTrue (servletTester.bagObjectFromPost (query, query).getString (STATUS).equals (ERROR));
+        assertTrue (servletTester.bagObjectFromPost (query, postData).getString (STATUS).equals (OK));
     }
 }
