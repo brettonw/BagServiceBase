@@ -34,6 +34,10 @@ public class Base_Test extends Base {
         event.ok ();
     }
 
+    public void handleEventDashName (Event event) {
+        event.ok ();
+    }
+
     private void assertGet (BagObject bagObject, BagObject query) {
         assertTrue (bagObject.getString (STATUS).equals (OK));
         bagObject = bagObject.getBagObject (QUERY).select (new SelectKey (SelectType.EXCLUDE, POST_DATA));
@@ -160,5 +164,11 @@ public class Base_Test extends Base {
         BagArray postData = BagArray.open (BagObject.open (EVENT, VERSION)).add (BagObject.open (EVENT, "help"));
         assertTrue (servletTester.bagObjectFromPost (query, query).getString (STATUS).equals (ERROR));
         assertTrue (servletTester.bagObjectFromPost (query, postData).getString (STATUS).equals (OK));
+    }
+
+    @Test
+    public void testDashName () throws IOException {
+        BagObject query = BagObject.open (EVENT, "-dash-name");
+        assertGet (servletTester.bagObjectFromGet (query), query);
     }
 }

@@ -33,7 +33,10 @@
         "description": "Ok.",
         "strict": false
     },
-    "nohandler": {
+    "no-handler": {
         "description": "An event with no handler, passes validation, but can't be invoked."
+    },
+    "-dash-name": {
+        "description": "A name that starts with a dash, and has a dash, so it should resolve to 'handleEventDashName'"
     }
 }
