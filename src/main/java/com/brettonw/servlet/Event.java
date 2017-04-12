@@ -20,14 +20,14 @@ public class Event {
 
     @Getter @NonNull private final BagObject query;
     @Getter @NonNull private final HttpServletRequest request;
-    @Getter          private BagObject response;
+    @Getter          private Bag response;
 
     public String getEventName () {
         return query.getString (EVENT);
     }
 
-    public Event respond (BagObject bagObject) {
-        response = bagObject;
+    public Event respond (Bag bag) {
+        response = bag;
         return this;
     }
 
