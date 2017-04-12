@@ -116,7 +116,7 @@ public class Base extends HttpServlet {
         out.close ();
     }
 
-    private Event handleEvent (BagObject query, HttpServletRequest request) throws IOException {
+    private Event handleEvent (BagObject query, HttpServletRequest request) {
         Event event = new Event (query, request);
         if (apiSchema != null) {
             // create the event object around the request parameters, and validate that it is
@@ -196,11 +196,11 @@ public class Base extends HttpServlet {
     }
 
     // default handlers
-    public void handleEventHelp (Event event) throws IOException {
+    public void handleEventHelp (Event event) {
         event.ok (apiSchema);
     }
 
-    public void handleEventVersion (Event event) throws IOException {
+    public void handleEventVersion (Event event) {
          event.ok (BagObject
                 .open (POM_VERSION, getClass ().getPackage ().getImplementationVersion ())
                 .put (POM_NAME, getClass ().getPackage ().getImplementationTitle ())
@@ -208,7 +208,7 @@ public class Base extends HttpServlet {
          );
     }
 
-    public void handleEventMultiple (Event event) throws IOException {
+    public void handleEventMultiple (Event event) {
         BagArray eventsArray = event.getQuery ().getBagArray (POST_DATA);
         if (eventsArray != null) {
             int eventCount = eventsArray.getCount ();

@@ -15,11 +15,11 @@ public class Base_Test extends Base {
         servletTester = new ServletTester (this);
     }
 
-    public void handleEventHello (Event event) throws IOException {
+    public void handleEventHello (Event event) {
         event.ok (BagObject.open  ("testing", "123"));
     }
 
-    public void handleEventGoodbye (Event event) throws IOException {
+    public void handleEventGoodbye (Event event) {
         assertTrue (event.getQuery () != null);
         assertTrue (event.getQuery ().has (POST_DATA));
         assertTrue (event.getRequest () != null);
@@ -30,7 +30,7 @@ public class Base_Test extends Base {
         event.ok (BagObject.open ("testing", "456"));
     }
 
-    public void handleEventOk (Event event) throws IOException {
+    public void handleEventOk (Event event) {
         event.ok ();
     }
 

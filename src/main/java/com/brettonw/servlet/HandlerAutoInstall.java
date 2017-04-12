@@ -3,7 +3,6 @@ package com.brettonw.servlet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -22,7 +21,7 @@ public class HandlerAutoInstall implements Handler<Event> {
     }
 
     @Override
-    public void handle (Event event) throws IOException {
+    public void handle (Event event) {
         try {
             method.invoke (container, event);
         } catch (IllegalAccessException exception) {

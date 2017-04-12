@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 import static com.brettonw.servlet.Keys.*;
 
@@ -27,27 +26,30 @@ public class Event {
         return query.getString (EVENT);
     }
 
-    public Event ok (Bag bag) throws IOException {
-        response = BagObject.open (QUERY, query).put (STATUS, OK).put (RESPONSE, bag);
+    public Event respond (BagObject bagObject) {
+        response = bagObject;
         return this;
     }
 
-    public Event ok () throws IOException {
+    public Event ok (Bag bag) {
+        return respond (BagObject.open (QUERY, query).put (STATUS, OK).put (RESPONSE, bag));
+    }
+
+    public Event ok () {
         return ok (null);
     }
 
-    public Event error (BagArray errors) throws IOException {
+    public Event error (BagArray errors) {
         // log the errors
         for (int i = 0, end = errors.getCount (); i < end; ++i) {
             log.error (errors.getString (i));
         }
 
         // and respond to the end user...
-        response = BagObject.open (QUERY, query).put (STATUS, ERROR).put (ERROR, errors);
-        return this;
+        return respond (BagObject.open (QUERY, query).put (STATUS, ERROR).put (ERROR, errors));
     }
 
-    public Event error (String error) throws IOException {
+    public Event error (String error) {
         return error (BagArray.open (error));
     }
 }
