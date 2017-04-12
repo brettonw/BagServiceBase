@@ -29,7 +29,7 @@ public class Handler {
     }
 
     public void handle (Event event) {
-        log.info (event);
+        log.info (eventName);
         try {
             method.invoke (container, event);
         } catch (IllegalAccessException exception) {
