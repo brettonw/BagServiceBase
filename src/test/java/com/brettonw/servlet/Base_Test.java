@@ -54,8 +54,14 @@ public class Base_Test extends Base {
     }
 
     @Test
-    public void testMissingEvent () throws IOException {
+    public void testUnknownEvent () throws IOException {
         BagObject query = BagObject.open (EVENT, "nohandler");
+        assertTrue (servletTester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
+    }
+
+    @Test
+    public void testMissingHandler () throws IOException {
+        BagObject query = BagObject.open (EVENT, "no-handler");
         assertTrue (servletTester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
     }
 

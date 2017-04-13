@@ -50,7 +50,7 @@ public class Base extends HttpServlet {
         if ((apiSchema = BagObjectFrom.resource (getClass (), "/api.json")) != null) {
             // autowire... loop over the elements in the schema, looking for functions that match
             // the signature, "handleEventXXX"
-            String[] eventNames = apiSchema.keys ();
+            String[] eventNames = apiSchema.getBagObject (EVENTS).keys ();
             for (String eventName : eventNames) {
                 install (eventName);
             }
@@ -123,10 +123,11 @@ public class Base extends HttpServlet {
             // a known event
             String eventName = event.getEventName ();
             if (eventName != null) {
-                if (apiSchema.has (eventName)) {
+                BagObject eventSpecification = apiSchema.getBagObject (Key.cat (EVENTS, eventName));
+                if (eventSpecification != null) {
                     // validate the query parameters
-                    BagObject parameterSpecification = apiSchema.getBagObject (Key.cat (eventName, PARAMETERS));
-                    boolean strict = apiSchema.getBoolean (Key.cat (eventName, STRICT), () -> true);
+                    BagObject parameterSpecification = eventSpecification.getBagObject (PARAMETERS);
+                    boolean strict = eventSpecification.getBoolean (STRICT, () -> true);
                     BagArray validationErrors = new BagArray ();
 
                     if (strict) {
@@ -169,13 +170,13 @@ public class Base extends HttpServlet {
                         event.error (validationErrors);
                     }
                 } else {
-                    event.error ("Missing schema for '" + EVENT + "' (" + eventName + ")");
+                    event.error ("Unknown '" + EVENT + "' (" + eventName + ")");
                 }
             } else {
                 event.error ("Missing: '" + EVENT + "'");
             }
         } else {
-            event.error ("Missing schema");
+            event.error ("Missing API schema");
         }
         return event;
     }
