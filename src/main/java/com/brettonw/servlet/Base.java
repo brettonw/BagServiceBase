@@ -49,7 +49,7 @@ public class Base extends HttpServlet {
         handlers = new HashMap<> ();
         if ((api = BagObjectFrom.resource (getClass (), "/api.json")) != null) {
             // autowire... loop over the elements in the schema, looking for functions that match
-            // the signature, "handleEventXXX"
+            // the signature, "handleEventXxxYyy"
             String[] eventNames = api.getBagObject (EVENTS).keys ();
             for (String eventName : eventNames) {
                 install (eventName);
@@ -59,18 +59,24 @@ public class Base extends HttpServlet {
         }
     }
 
+    public String getDisplayName () {
+        if ((api != null) && (api.has (NAME))) return api.getString (NAME);
+        if ((context != null) && (context.getServletContextName () != null)) return context.getServletContextName ();
+        return "[UNNAMED]";
+    }
+
     @Override
     public void init (ServletConfig config) throws ServletException {
         super.init (config);
         context = config.getServletContext ();
-        log.debug ("STARTING " + context.getServletContextName ());
+        log.debug ("STARTING " + getDisplayName ());
         setAttribute (SERVLET, this);
     }
 
     @Override
     public void destroy () {
         super.destroy ();
-        log.debug (context.getServletContextName () + " DESTROYING...");
+        log.debug (getDisplayName () + " DESTROYING...");
     }
 
     @Override
@@ -203,11 +209,11 @@ public class Base extends HttpServlet {
     }
 
     public void handleEventVersion (Event event) {
-         event.ok (BagObject
+        event.ok (BagObject
                 .open (POM_VERSION, getClass ().getPackage ().getImplementationVersion ())
                 .put (POM_NAME, getClass ().getPackage ().getImplementationTitle ())
-                .put (DISPLAY_NAME, context.getServletContextName ())
-         );
+                .put (DISPLAY_NAME, getDisplayName ())
+        );
     }
 
     public void handleEventMultiple (Event event) {
