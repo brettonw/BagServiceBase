@@ -119,7 +119,7 @@ public class Base_Test extends Base {
     public void testEmptyRequest () throws IOException {
         BagObject response = servletTester.bagObjectFromGet ("");
         assertTrue (response.getString (STATUS).equals (ERROR));
-        assertTrue (response.getString (Key.cat (ERROR, 0)).equals ("Missing: '" + EVENT + "'"));
+        assertTrue (response.getString (Key.cat (ERROR, 0)).equals ("Missing '" + EVENT + "'"));
     }
 
     @Test

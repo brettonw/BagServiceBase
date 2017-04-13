@@ -42,20 +42,20 @@ public class Base extends HttpServlet {
     }
 
     private final Map<String, Handler> handlers;
-    protected BagObject apiSchema;
+    protected BagObject api;
 
     protected Base () {
         // try to load the schema and wire up the handlers
         handlers = new HashMap<> ();
-        if ((apiSchema = BagObjectFrom.resource (getClass (), "/api.json")) != null) {
+        if ((api = BagObjectFrom.resource (getClass (), "/api.json")) != null) {
             // autowire... loop over the elements in the schema, looking for functions that match
             // the signature, "handleEventXXX"
-            String[] eventNames = apiSchema.getBagObject (EVENTS).keys ();
+            String[] eventNames = api.getBagObject (EVENTS).keys ();
             for (String eventName : eventNames) {
                 install (eventName);
             }
         } else {
-            log.error ("Failed to load servlet schema");
+            log.error ("Failed to load API");
         }
     }
 
@@ -118,12 +118,12 @@ public class Base extends HttpServlet {
 
     private Event handleEvent (BagObject query, HttpServletRequest request) {
         Event event = new Event (query, request);
-        if (apiSchema != null) {
+        if (api != null) {
             // create the event object around the request parameters, and validate that it is
             // a known event
             String eventName = event.getEventName ();
             if (eventName != null) {
-                BagObject eventSpecification = apiSchema.getBagObject (Key.cat (EVENTS, eventName));
+                BagObject eventSpecification = api.getBagObject (Key.cat (EVENTS, eventName));
                 if (eventSpecification != null) {
                     // validate the query parameters
                     BagObject parameterSpecification = eventSpecification.getBagObject (PARAMETERS);
@@ -137,7 +137,7 @@ public class Base extends HttpServlet {
                             String queryParameter = queryParameters[i];
                             if (!queryParameter.equals (EVENT)) {
                                 if ((parameterSpecification == null) || (!parameterSpecification.has (queryParameter))) {
-                                    validationErrors.add ("Unspecified parameter supplied: '" + queryParameter + "'");
+                                    validationErrors.add ("Unspecified parameter: '" + queryParameter + "'");
                                 }
                             }
                         }
@@ -173,10 +173,10 @@ public class Base extends HttpServlet {
                     event.error ("Unknown '" + EVENT + "' (" + eventName + ")");
                 }
             } else {
-                event.error ("Missing: '" + EVENT + "'");
+                event.error ("Missing '" + EVENT + "'");
             }
         } else {
-            event.error ("Missing API schema");
+            event.error ("Missing API");
         }
         return event;
     }
@@ -199,7 +199,7 @@ public class Base extends HttpServlet {
     }
 
     public void handleEventHelp (Event event) {
-        event.ok (apiSchema);
+        event.ok (api);
     }
 
     public void handleEventVersion (Event event) {
