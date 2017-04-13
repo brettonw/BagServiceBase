@@ -137,7 +137,7 @@ public class Base extends HttpServlet {
                             String queryParameter = queryParameters[i];
                             if (!queryParameter.equals (EVENT)) {
                                 if ((parameterSpecification == null) || (!parameterSpecification.has (queryParameter))) {
-                                    validationErrors.add ("Unknown parameter supplied: '" + queryParameter + "'");
+                                    validationErrors.add ("Unspecified parameter supplied: '" + queryParameter + "'");
                                 }
                             }
                         }
@@ -221,7 +221,7 @@ public class Base extends HttpServlet {
             }
             event.ok (results);
         } else {
-            event.error ("No messages found (expected an array in '" + POST_DATA + "')");
+            event.error ("No events found (expected an array in '" + POST_DATA + "')");
         }
     }
 }
