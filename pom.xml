@@ -7,12 +7,13 @@
         <version>RELEASE</version>
     </parent>
 
-    <artifactId>servlet-base</artifactId>
+    <groupId>com.brettonw.bag</groupId>
+    <artifactId>service-base</artifactId>
     <version>3.4.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Servlet Base</name>
-    <description>ServletBase provides a base implementation for a JSON request/response server.</description>
+    <name>Service Base</name>
+    <description>ServiceBase provides a base implementation for a JSON request/response server.</description>
     <url>http://brettonw.com?github/servlet-base/</url>
     <scm>
         <connection>scm:git:git@github.com:brettonw/ServletBase.git</connection>
