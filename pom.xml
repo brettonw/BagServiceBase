@@ -9,11 +9,11 @@
 
     <groupId>com.brettonw.bag</groupId>
     <artifactId>service-base</artifactId>
-    <version>3.4.3-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Service Base</name>
-    <description>ServiceBase provides a base implementation for a JSON request/response server.</description>
+    <description>ServiceBase provides a base implementation for a JSON request/response microservice WAR.</description>
     <url>http://brettonw.com?github/servlet-base/</url>
     <scm>
         <connection>scm:git:git@github.com:brettonw/ServletBase.git</connection>
