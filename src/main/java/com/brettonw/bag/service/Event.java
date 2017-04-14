@@ -1,4 +1,4 @@
-package com.brettonw.servlet;
+package com.brettonw.bag.service;
 
 import com.brettonw.bag.Bag;
 import com.brettonw.bag.BagArray;
@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static com.brettonw.servlet.Keys.*;
+import static com.brettonw.bag.service.Keys.*;
 
 @Data @RequiredArgsConstructor
 public class Event {

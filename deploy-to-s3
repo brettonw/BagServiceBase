@@ -7,5 +7,5 @@
 echo "pushing to S3..."
 pushd website
 dotclean.js .
-aws s3 sync --profile "bretton.wade@gmail.com" . s3://aws-website-servletbase-794ri --delete
+aws s3 sync --profile "bretton.wade@gmail.com" . s3://aws-website-bagservicebase-u9kw7 --delete
 popd

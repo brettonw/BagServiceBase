@@ -1,4 +1,4 @@
-package com.brettonw.servlet;
+package com.brettonw.bag.service;
 
 import lombok.Getter;
 import org.apache.logging.log4j.LogManager;

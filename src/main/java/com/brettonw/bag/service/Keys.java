@@ -1,4 +1,4 @@
-package com.brettonw.servlet;
+package com.brettonw.bag.service;
 
 public class Keys {
     public static final String CONTENT_TYPE = "Content-Type";

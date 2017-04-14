@@ -1,11 +1,12 @@
-package com.brettonw.servlet;
+package com.brettonw.bag.service;
 
 import com.brettonw.bag.*;
+import com.brettonw.servlet.ServletTester;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.brettonw.servlet.Keys.*;
+import static com.brettonw.bag.service.Keys.*;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 

@@ -12,13 +12,13 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Service Base</name>
-    <description>ServiceBase provides a base implementation for a JSON request/response microservice WAR.</description>
-    <url>http://brettonw.com?github/servlet-base/</url>
+    <name>Bag Service Base</name>
+    <description>Bag Service Base is a tool for quickly building lightweight micro-services in Java, using JSON for communications.</description>
+    <url>http://bag-service-base.brettonw.com</url>
     <scm>
-        <connection>scm:git:git@github.com:brettonw/ServletBase.git</connection>
-        <developerConnection>scm:git:git@github.com:brettonw/ServletBase.git</developerConnection>
-        <url>https://github.com:brettonw/ServletBase.git</url>
+        <connection>scm:git:git@github.com:brettonw/BagServiceBase.git</connection>
+        <developerConnection>scm:git:git@github.com:brettonw/BagServiceBase.git</developerConnection>
+        <url>https://github.com:brettonw/BagServiceBase.git</url>
     </scm>
 
     <dependencies>
