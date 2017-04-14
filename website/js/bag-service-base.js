@@ -98,7 +98,7 @@ let ServletBase = function () {
                 document.title = db.name;
                 innerHTML = block ("h1", {}, db.name) + div("container-div", innerHTML);
             }
-            innerHTML += div ("content-center footer", "Built with " + a ("footer-link", "https://github.com/brettonw/BagServiceBase", "brettonw/BagServiceBase"));
+            innerHTML += div ("content-center footer", "Built with " + a ("footer-link", "http://bag-service-base.brettonw.com", "brettonw/BagServiceBase"));
 
             document.getElementById(displayInDivId).innerHTML = innerHTML;
         };
