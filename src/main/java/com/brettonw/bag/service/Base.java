@@ -17,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.brettonw.bag.service.Keys.*;
+
 public class Base extends HttpServlet {
     private static final Logger log = LogManager.getLogger (Base.class);
 
@@ -48,19 +50,37 @@ public class Base extends HttpServlet {
         if ((api = BagObjectFrom.resource (getClass (), "/api.json")) != null) {
             // autowire... loop over the elements in the schema, looking for functions that match
             // the signature, "handleEventXxxYyy"
-            String[] eventNames = api.getBagObject (Keys.EVENTS).keys ();
+            String[] eventNames = api.getBagObject (EVENTS).keys ();
             for (String eventName : eventNames) {
                 install (eventName);
             }
+
+            // if the API didn't supply a name, add one
+            api.put (NAME, getDisplayName ());
         } else {
             log.error ("Failed to load API");
         }
     }
 
     public String getDisplayName () {
-        if ((api != null) && (api.has (Keys.NAME))) return api.getString (Keys.NAME);
-        if ((context != null) && (context.getServletContextName () != null)) return context.getServletContextName ();
-        return "[UNNAMED]";
+        String name = null;
+
+        // if the designer supplied a name...
+        if ((name == null) && (api != null) && (api.has (NAME))) {
+            name = api.getString (NAME);
+        }
+
+        // or if the web context supplies a name...
+        if ((name == null) && (context != null) && (context.getServletContextName () != null)) {
+            name = context.getServletContextName ();
+        }
+
+        // but the POM has a name
+        if (name == null) {
+            name = getClass ().getPackage ().getImplementationTitle ();
+        }
+
+        return (name != null) ? name : "[UNNAMED]";
     }
 
     @Override
@@ -68,7 +88,7 @@ public class Base extends HttpServlet {
         super.init (config);
         context = config.getServletContext ();
         log.debug ("STARTING " + getDisplayName ());
-        setAttribute (Keys.SERVLET, this);
+        setAttribute (SERVLET, this);
     }
 
     @Override
@@ -88,7 +108,7 @@ public class Base extends HttpServlet {
         // get the request data type, then tease out the response type (use a default if it's not present) and the
         // charset (if given, otherwise default to UTF-8, because that's what it will be in Java)
         String mimeType = MimeType.DEFAULT;
-        String contentTypeHeader = request.getHeader (Keys.CONTENT_TYPE);
+        String contentTypeHeader = request.getHeader (CONTENT_TYPE);
         if (contentTypeHeader != null) {
             String[] contentType = contentTypeHeader.replace (" ", "").split (";");
             mimeType = contentType[0];
@@ -106,7 +126,7 @@ public class Base extends HttpServlet {
 
         // handle the query part normally, but add the post data to it (if any)
         BagObject query = BagObjectFrom.string (request.getQueryString (), MimeType.URL, () -> new BagObject ())
-                .put (Keys.POST_DATA, postData);
+                .put (POST_DATA, postData);
         handleRequest (query, request, response);
     }
 
@@ -127,11 +147,11 @@ public class Base extends HttpServlet {
             // a known event
             String eventName = event.getEventName ();
             if (eventName != null) {
-                BagObject eventSpecification = api.getBagObject (Key.cat (Keys.EVENTS, eventName));
+                BagObject eventSpecification = api.getBagObject (Key.cat (EVENTS, eventName));
                 if (eventSpecification != null) {
                     // validate the query parameters
-                    BagObject parameterSpecification = eventSpecification.getBagObject (Keys.PARAMETERS);
-                    boolean strict = eventSpecification.getBoolean (Keys.STRICT, () -> true);
+                    BagObject parameterSpecification = eventSpecification.getBagObject (PARAMETERS);
+                    boolean strict = eventSpecification.getBoolean (STRICT, () -> true);
                     BagArray validationErrors = new BagArray ();
 
                     if (strict) {
@@ -139,7 +159,7 @@ public class Base extends HttpServlet {
                         String[] queryParameters = query.keys ();
                         for (int i = 0; i < queryParameters.length; ++i) {
                             String queryParameter = queryParameters[i];
-                            if (!queryParameter.equals (Keys.EVENT)) {
+                            if (!queryParameter.equals (EVENT)) {
                                 if ((parameterSpecification == null) || (!parameterSpecification.has (queryParameter))) {
                                     validationErrors.add ("Unspecified parameter: '" + queryParameter + "'");
                                 }
@@ -152,7 +172,7 @@ public class Base extends HttpServlet {
                         String[] expectedParameters = parameterSpecification.keys ();
                         for (int i = 0; i < expectedParameters.length; ++i) {
                             String expectedParameter = expectedParameters[i];
-                            if (parameterSpecification.getBoolean (Key.cat (expectedParameter, Keys.REQUIRED), () -> false)) {
+                            if (parameterSpecification.getBoolean (Key.cat (expectedParameter, REQUIRED), () -> false)) {
                                 if (!query.has (expectedParameter)) {
                                     validationErrors.add ("Missing required parameter: '" + expectedParameter + "'");
                                 }
@@ -168,16 +188,16 @@ public class Base extends HttpServlet {
                             // finally, do your business
                             handler.handle (event);
                         } else {
-                            event.error ("No handler installed for '" + Keys.EVENT + "' (" + eventName + ")");
+                            event.error ("No handler installed for '" + EVENT + "' (" + eventName + ")");
                         }
                     } else {
                         event.error (validationErrors);
                     }
                 } else {
-                    event.error ("Unknown '" + Keys.EVENT + "' (" + eventName + ")");
+                    event.error ("Unknown '" + EVENT + "' (" + eventName + ")");
                 }
             } else {
-                event.error ("Missing '" + Keys.EVENT + "'");
+                event.error ("Missing '" + EVENT + "'");
             }
         } else {
             event.error ("Missing API");
@@ -192,7 +212,7 @@ public class Base extends HttpServlet {
             log.info ("Installed '" + handler.getMethodName () + "'");
             return true;
         } catch (NoSuchMethodException exception) {
-            log.error ("Install '" + Keys.EVENT + "' failed for (" + eventName + ")", exception);
+            log.error ("Install '" + EVENT + "' failed for (" + eventName + ")", exception);
             return false;
         }
     }
@@ -208,14 +228,13 @@ public class Base extends HttpServlet {
 
     public void handleEventVersion (Event event) {
         event.ok (BagObject
-                .open (Keys.POM_VERSION, getClass ().getPackage ().getImplementationVersion ())
-                .put (Keys.POM_NAME, getClass ().getPackage ().getImplementationTitle ())
-                .put (Keys.DISPLAY_NAME, getDisplayName ())
+                .open (POM_VERSION, getClass ().getPackage ().getImplementationVersion ())
+                .put (DISPLAY_NAME, getDisplayName ())
         );
     }
 
     public void handleEventMultiple (Event event) {
-        BagArray eventsArray = event.getQuery ().getBagArray (Keys.POST_DATA);
+        BagArray eventsArray = event.getQuery ().getBagArray (POST_DATA);
         if (eventsArray != null) {
             int eventCount = eventsArray.getCount ();
             BagArray results = new BagArray (eventCount);
@@ -225,7 +244,7 @@ public class Base extends HttpServlet {
             }
             event.ok (results);
         } else {
-            event.error ("No events found (expected an array in '" + Keys.POST_DATA + "')");
+            event.error ("No events found (expected an array in '" + POST_DATA + "')");
         }
     }
 }
