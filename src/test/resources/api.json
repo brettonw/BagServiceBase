@@ -1,13 +1,8 @@
 {
-    "name": "Test",
     "description": "Test API for ServletBase",
     "events": {
         "version": {
             "description": "Return the build version for the current WAR.",
-            "example": {}
-        },
-        "help": {
-            "description": "Get the API description.",
             "example": {}
         },
         "multiple": {
@@ -32,7 +27,7 @@
                 "param1": {"description": "1st Parameter", "required": true },
                 "param2": {"description": "2nd Parameter", "required": true },
                 "param3": {"description": "3rd Parameter"},
-                "post-data": {"description": "a list of other stuff", "required": true}
+                "post-data/test1": {"description": "a list of other stuff", "required": true}
             }
         },
         "ok": {

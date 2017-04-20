@@ -7,6 +7,7 @@ public class Keys {
     public static final String ERROR = "error";
     public static final String EVENT = "event";
     public static final String EVENTS = "events";
+    public static final String EXAMPLE = "example";
     public static final String HELP = "help";
     public static final String MULTIPLE = "multiple";
     public static final String NAME = "name";

@@ -125,10 +125,16 @@ public class Base_Test extends Base {
 
     @Test
     public void testHelp () throws IOException {
-        BagObject query = BagObject.open (EVENT, "help");
+        BagObject query = BagObject.open (EVENT, HELP);
         BagObject response = servletTester.bagObjectFromGet (query);
         assertTrue (response.getString (STATUS).equals (OK));
-        assertTrue (response.getBagObject (RESPONSE).equals (BagObjectFrom.resource (Base_Test.class, "/api.json")));
+
+        // make a dummy object that should match the response, and verify it does
+        BagObject verify = BagObjectFrom.resource (Base_Test.class, "/api.json");
+        String help = Key.cat (EVENTS, HELP);
+        verify.put (help, api.getObject (help));
+        verify.put (NAME, api.getObject (NAME));
+        assertTrue (response.getBagObject (RESPONSE).equals (verify));
     }
 
     @Test

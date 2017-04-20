@@ -48,21 +48,30 @@ public class Base extends HttpServlet {
         // try to load the schema and wire up the handlers
         handlers = new HashMap<> ();
         if ((api = BagObjectFrom.resource (getClass (), "/api.json")) != null) {
+            // if the API didn't supply a name, add one
+            api.put (NAME, getName ());
+
+            // add a 'help' event if one isn't supplied
+            String help = Key.cat (EVENTS, HELP);
+            if (! api.has (help)) {
+                api.put (help, BagObject
+                        .open (DESCRIPTION,"Get the API description.")
+                        .put (EXAMPLE, new BagObject ())
+                );
+            }
+
             // autowire... loop over the elements in the schema, looking for functions that match
             // the signature, "handleEventXxxYyy"
             String[] eventNames = api.getBagObject (EVENTS).keys ();
             for (String eventName : eventNames) {
                 install (eventName);
             }
-
-            // if the API didn't supply a name, add one
-            api.put (NAME, getDisplayName ());
         } else {
             log.error ("Failed to load API");
         }
     }
 
-    public String getDisplayName () {
+    public String getName () {
         String name = null;
 
         // if the designer supplied a name...
@@ -70,14 +79,14 @@ public class Base extends HttpServlet {
             name = api.getString (NAME);
         }
 
+        // or if the POM has a name
+        if (name == null) {
+            name = getClass ().getPackage ().getImplementationTitle ();
+        }
+
         // or if the web context supplies a name...
         if ((name == null) && (context != null) && (context.getServletContextName () != null)) {
             name = context.getServletContextName ();
-        }
-
-        // but the POM has a name
-        if (name == null) {
-            name = getClass ().getPackage ().getImplementationTitle ();
         }
 
         return (name != null) ? name : "[UNNAMED]";
@@ -87,14 +96,14 @@ public class Base extends HttpServlet {
     public void init (ServletConfig config) throws ServletException {
         super.init (config);
         context = config.getServletContext ();
-        log.debug ("STARTING " + getDisplayName ());
+        log.debug ("STARTING " + getName ());
         setAttribute (SERVLET, this);
     }
 
     @Override
     public void destroy () {
         super.destroy ();
-        log.debug (getDisplayName () + " DESTROYING...");
+        log.debug (getName () + " DESTROYING...");
     }
 
     @Override
@@ -229,7 +238,7 @@ public class Base extends HttpServlet {
     public void handleEventVersion (Event event) {
         event.ok (BagObject
                 .open (POM_VERSION, getClass ().getPackage ().getImplementationVersion ())
-                .put (DISPLAY_NAME, getDisplayName ())
+                .put (DISPLAY_NAME, getName ())
         );
     }
 

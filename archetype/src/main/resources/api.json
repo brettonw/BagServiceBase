@@ -1,0 +1,47 @@
+{
+    "name": "[OPTIONAL] - the name to use for display purposes. If you don't supply this, the POM name will be used.",
+    "description": "[OPTIONAL] - the description used for display purposes.",
+    "events": {
+        "help": {
+            "description": "Get the API description.",
+            "INTERNAL": "[REMOVE] This event is handled by the Base, and is automatically added if you don't supply it.",
+            "example": {}
+        },
+        "version": {
+            "description": "Return the build version for the current WAR.",
+            "NOTE": "[REMOVE] This event is handled by the Base. You can choose to expose it (or not) by including it in the api.json file.",
+            "example": {}
+        },
+        "multiple": {
+            "description": "Handle multiple events in array format.",
+            "NOTE": "[REMOVE] This event is handled by the Base. You can choose to expose it (or not) by including it in the api.json file.",
+            "parameters": {
+                "post-data": { "description": "An array of other events", "required": true }
+            }
+        },
+        "ok": {
+            "description": "Ok.",
+            "NOTE": "[REMOVE] This event is handled by the Base. You can choose to expose it (or not) by including it in the api.json file.",
+            "example": {}
+        },
+        "example": {
+            "description": "An example event description showing required and optional parameters. The 'example' field is used by the documentation to provide a 'try-it' link.",
+            "parameters": {
+                "abc": {"description": "Example data" },
+                "xyz": {"description": "Example data", "required": true }
+            },
+            "example": { "abc": 123, "xyz": 456 }
+        },
+        "example-post": {
+            "description": "An example event showing how to require a field in POST data. The post object is not otherwise validated.",
+            "parameters": {
+                "post-data/test1": {"description": "Example data in the POST object", "required": true }
+            }
+        },
+        "example-nonstrict": {
+            "description": "Most events will strictly check the parameters against the list supplied, but you can turn off this checking by setting 'strict' to false.",
+            "strict": false,
+            "example": { "param1": "xxx", "param2": "yyy" }
+        }
+    }
+}
