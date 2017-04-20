@@ -1,4 +1,4 @@
-let ServletBase = function () {
+let ServiceBase = function () {
     let _ = Object.create (null);
 
     // Helper functions for emitting HTML from Javascript
