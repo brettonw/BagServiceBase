@@ -74,18 +74,25 @@ let ServiceBase = function () {
                         eventHTML += div ("event-description", event.description);
                     }
 
-                    let odd = true;
-                    if ("parameters" in event) {
-                        let parameterNames = Object.keys (event.parameters);
-                        for (let parameterName of parameterNames) {
-                            let parameter = event.parameters[parameterName];
-                            let required = ("required" in parameter) ? parameter.required : false;
-                            eventHTML += div ("parameter-div" + (odd ? " odd" : ""),
-                                div ("parameter-name", parameterName) +
-                                div ("parameter-required", required ? "REQUIRED" : "OPTIONAL") +
-                                div ("parameter-description", parameter.description));
-                            odd = !odd;
+                    let evenOdd = function (title, object) {
+                        let odd = true;
+                        let names = Object.keys (object);
+                        if (names.length > 0) {
+                            eventHTML += block ("h3", {}, title);
+                            for (let name of names) {
+                                let element = object[name];
+                                let required = ("required" in element) ? element.required : false;
+                                eventHTML += div ("parameter-div" + (odd ? " odd" : ""),
+                                    div ("parameter-name", parameterName) +
+                                    div ("parameter-required", required ? "REQUIRED" : "OPTIONAL") +
+                                    div ("parameter-description", element.description));
+                                odd = !odd;
+                            }
                         }
+                    };
+
+                    if ("parameters" in event) {
+                        evenOdd ("Parameters:", event.parameters);
                     }
 
                     if (("strict" in event) && (event.strict == "false")) {
@@ -95,7 +102,6 @@ let ServiceBase = function () {
                             div ("parameter-description", "Event allows unspecified parameters."));
                     }
 
-                    odd = true;
                     if ("returns" in event) {
                         let returnTypeName = "";
                         let returns = event.returns;
@@ -106,11 +112,13 @@ let ServiceBase = function () {
                             // return specification might be an empty array, or an array with a single
                             // proto object
                             if (returns.length > 0) {
-                                returns = returns[0];
                                 returnTypeName + " of";
+                                evenOdd("Returns Array of:" + returnTypeName, returns[0]);
+                            } else {
+                                eventHTML += block ("h3", {}, "Returns: Array");
                             }
                         } else {
-
+                            evenOdd("Returns:", returns);
                         }
                     }
 
