@@ -83,7 +83,7 @@ let ServiceBase = function () {
                                 let element = object[name];
                                 let required = ("required" in element) ? element.required : false;
                                 eventHTML += div ("parameter-div" + (odd ? " odd" : ""),
-                                    div ("parameter-name", parameterName) +
+                                    div ("parameter-name", name) +
                                     div ("parameter-required", required ? "REQUIRED" : "OPTIONAL") +
                                     div ("parameter-description", element.description));
                                 odd = !odd;
