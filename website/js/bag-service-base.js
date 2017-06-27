@@ -103,17 +103,14 @@ let ServiceBase = function () {
                     }
 
                     if ("returns" in event) {
-                        let returnTypeName = "";
                         let returns = event.returns;
                         // return specification might be an array, indicating this event returns an
                         // array of something
                         if (Array.isArray(returns)) {
-                            returnTypeName = "Array";
                             // return specification might be an empty array, or an array with a single
                             // proto object
                             if (returns.length > 0) {
-                                returnTypeName + " of";
-                                evenOdd("Returns Array of:" + returnTypeName, returns[0]);
+                                evenOdd("Returns Array of:", returns[0]);
                             } else {
                                 eventHTML += div ("even-odd-title", "Returns: Array");
                             }
