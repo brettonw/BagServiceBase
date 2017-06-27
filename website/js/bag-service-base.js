@@ -28,14 +28,19 @@ let ServiceBase = function () {
     };
 
     // a little black raincloud, of course
-    _.display = function (displayInDivId, url) {
+    _.display = function (displayInDivId, inputUrl) {
         let request = new XMLHttpRequest ();
-        url = (typeof (url) !== "undefined") ? url : "api?event=help";
+        let url = (typeof (inputUrl) !== "undefined") ? inputUrl : "api?event=help";
         request.open ("GET", url, true);
         request.overrideMimeType ("application/json");
         request.onload = function () {
             // parse the data
-            let db = JSON.parse (this.responseText).response;
+            let db = JSON.parse (this.responseText);
+
+            // if we retrieved the api.json from the service base, get the actual response
+            if (typeof (inputUrl) === "undefined") { db = db.response; }
+
+            // start with an empty build
             let innerHTML = "";
 
             if ("description" in db) {
