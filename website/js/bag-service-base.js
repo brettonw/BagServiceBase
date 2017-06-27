@@ -28,9 +28,10 @@ let ServiceBase = function () {
     };
 
     // a little black raincloud, of course
-    _.display = function (displayInDivId) {
+    _.display = function (displayInDivId, url) {
         let request = new XMLHttpRequest ();
-        request.open ("GET", "api?event=help", true);
+        url = (typeof (url) !== "undefined") ? url : "api?event=help";
+        request.open ("GET", url, true);
         request.overrideMimeType ("application/json");
         request.onload = function () {
             // parse the data
