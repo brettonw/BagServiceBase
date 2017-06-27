@@ -78,7 +78,7 @@ let ServiceBase = function () {
                         let odd = true;
                         let names = Object.keys (object);
                         if (names.length > 0) {
-                            eventHTML += block ("h3", {}, title);
+                            eventHTML += div ("even-odd-title", title);
                             for (let name of names) {
                                 let element = object[name];
                                 let required = ("required" in element) ? element.required : false;
@@ -96,10 +96,10 @@ let ServiceBase = function () {
                     }
 
                     if (("strict" in event) && (event.strict == "false")) {
-                        eventHTML += div ("parameter-div" + (odd ? " odd" : ""),
-                            div ("parameter-name", "(any)") +
-                            div ("parameter-required", "OPTIONAL") +
-                            div ("parameter-description", "Event allows unspecified parameters."));
+                        eventHTML += div ("even-odd-div" + (odd ? " odd" : ""),
+                            div ("even-odd-name", "(any)") +
+                            div ("even-odd-required", "OPTIONAL") +
+                            div ("even-odd-description", "Event allows unspecified parameters."));
                     }
 
                     if ("returns" in event) {
@@ -115,7 +115,7 @@ let ServiceBase = function () {
                                 returnTypeName + " of";
                                 evenOdd("Returns Array of:" + returnTypeName, returns[0]);
                             } else {
-                                eventHTML += block ("h3", {}, "Returns: Array");
+                                eventHTML += div ("even-odd-title", "Returns: Array");
                             }
                         } else {
                             evenOdd("Returns:", returns);
