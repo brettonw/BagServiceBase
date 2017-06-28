@@ -14,7 +14,7 @@ h2 { margin:10px 0px; }
 .even-odd-div { border-radius:4px; width:95%; font-size:12px; margin-left:15px; margin-right:10px; padding:4px 6px; }
 .even-odd-name { vertical-align:middle; width:22%; font-family:monospace; font-style:italic; display:inline-block; }
 .even-odd-description { vertical-align:middle; width:62%; display:inline-block; margin-left:5px; }
-.even-odd-required { vertical-align:middle; width:12%; display:inline-block; margin-left:5px; }
+.even-odd-required { vertical-align:middle; width:12%; display:inline-block; margin-left:5px; color: #bbb; }
 .odd { background:#eaeaea; }
 .footer { width:50%; color:#aaa; font-size:10px; text-align:center; margin-top:3px; }
 .footer-link { color:#888; font-size:10px; text-decoration:none; }
