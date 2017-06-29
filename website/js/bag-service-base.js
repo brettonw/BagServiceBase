@@ -74,8 +74,9 @@ let ServiceBase = function () {
                         eventHTML += div ("event-description", event.description);
                     }
 
+                    let odd;
                     let evenOdd = function (title, object) {
-                        let odd = true;
+                        odd = true;
                         let names = Object.keys (object);
                         if (names.length > 0) {
                             eventHTML += div ("even-odd-title", title);
@@ -89,6 +90,7 @@ let ServiceBase = function () {
                                 odd = !odd;
                             }
                         }
+                        return odd;
                     };
 
                     if ("parameters" in event) {
