@@ -174,7 +174,7 @@ let ServiceBase = function () {
                     // set up the function name and an empty parameter list
                     let functionName = makeName (eventName);
                     let functionParameters = "(";
-                    let functionBody = '\tlet url = "' + baseUrl + '/api?event=' + eventName + '";\n';
+                    let functionBody = '    let url = "' + baseUrl + '/api?event=' + eventName + '";\n';
 
                     // if there are parameters, add them
                     let first = true;
@@ -184,13 +184,17 @@ let ServiceBase = function () {
                             for (let name of names) {
                                 let parameterName = makeName (name);
                                 functionParameters += ((first !== true) ? ", " : "") + parameterName;
-                                functionBody += '\turl += "' + name + '=" + ' + parameterName + ';\n';
+                                functionBody += '    url += "' + name + '=" + ' + parameterName + ';\n';
                                 first = false;
                             }
                         }
                     }
                     functionParameters += ((first !== true) ? ", " : "") + "onSuccess";
-                    functionBody += "\tServiceBase.get (url, onSuccess);\n";
+                    functionBody += '    ServiceBase.get (url, function (response) {\n';
+                    functionBody += '        if (response.status === "ok") {\n';
+                    functionBody += '            onSuccess (response.response);\n';
+                    functionBody += '        }\n';
+                    functionBody += '    });\n';
                     functionParameters += ")";
 
                     console.log (functionName + " " + functionParameters + ";\n");
