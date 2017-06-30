@@ -16,9 +16,7 @@
 
 <script src="../js/bag-service-base.js"></script>
 <script>
-    let myApi;
     ServiceBase.api (function (api) {
-        myApi = api;
         let html = ServiceBase.displaySpecification(api.specification);
         document.getElementById("service-base").innerHTML = html;
 
