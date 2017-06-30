@@ -50,7 +50,7 @@ let ServiceBase = function () {
             if ("events" in db) {
                 innerHTML += block ("h2", {}, "Events");
                 let events = db.events;
-                let eventNames = Object.keys (events).sort ();
+                let eventNames = Object.keys (events);
                 let eventsHTML = "";
                 for (let eventName of eventNames) {
                     let event = events[eventName];
@@ -133,6 +133,76 @@ let ServiceBase = function () {
             innerHTML += div ("content-center footer", "Built with " + a ("footer-link", "http://bag-service-base.brettonw.com", "brettonw/BagServiceBase"));
 
             document.getElementById(displayInDivId).innerHTML = innerHTML;
+        };
+        request.send ();
+    };
+
+    _.api = function (inputUrl, callback) {
+        let makeName = function (input) {
+            return input.replace (/-([^-])/g, function replacer (match, p1, offset, string) {
+                return p1.toUpperCase();
+            });
+        };
+
+        let request = new XMLHttpRequest ();
+        let url = (typeof (inputUrl) !== "undefined") ? inputUrl : "api?event=help";
+        request.open ("GET", url, true);
+        request.overrideMimeType ("application/json");
+        request.onload = function () {
+            // parse the data
+            let db = JSON.parse (this.responseText);
+
+            // if we retrieved the api.json from the service base, get the actual response
+            if (typeof (inputUrl) === "undefined") { db = db.response; }
+
+            // start with an empty build
+            let api = Object.create (null);
+            let apiString = "";
+
+            // check that we got a response with events
+            if ("events" in db) {
+                let events = db.events;
+                let eventNames = Object.keys (events);
+                for (let eventName of eventNames) {
+                    let event = events[eventName];
+
+                    // convert the event name into a function name (dashes are removed and the
+                    // following character is uppercased)
+                    function replacer(match, p1, offset, string) {
+                        return p1.toUpperCase();
+                    }
+                    let functionName = makeName (eventName);
+                    let functionParameters = "(";
+
+                    // if there are parameters, add them
+                    if ("parameters" in event) {
+                        let first = true;
+                        let names = Object.keys (event.parameters);
+                        if (names.length > 0) {
+                            for (let name of names) {
+                                let parameter = event.parameters[name];
+                                if (first === true) {
+                                    first = false;
+                                } else {
+                                    functionParameters += ", ";
+                                }
+                                functionParameters += makeName (name);
+                            }
+                        }
+                    }
+                    functionParameters += ")";
+
+                    apiString += functionName + " " + functionParameters + ";\n";
+
+                    api[functionName] = new Function ("return function " + functionParameters + " {" +
+                            // need to add service base call of function from here
+                            "};") ();
+                }
+            }
+            console.log (apiString);
+            if (typeof callback !== "undefined") {
+                callback (api);
+            }
         };
         request.send ();
     };

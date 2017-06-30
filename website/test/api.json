@@ -1,0 +1,70 @@
+{
+    "name": "Authorization Service",
+    "description": "A test service specification mocking an authorization API.",
+    "events": {
+        "version": {
+            "description": "Return the build version for the current WAR.",
+            "returns":{
+                "display-name": {"description": "The display name of the service.", "required": true},
+                "pom-version": {"description": "Build Version Number, e.g. '1.0.0'.", "required": true}
+            },
+            "example": {}
+        },
+        "login": {
+            "description": "Login for a device.",
+            "parameters": {
+                "timestamp": {"description": "UNIX timestamp.", "required": true},
+                "authorization-token": {"description": "A string used to validate permissions.", "required": true},
+                "device-id": {"description": "A string that uniquely identifies the mobile device.", "required": true}
+            },
+            "returns": {
+                "authorization-token": {"description":"A string used to validate permissions.", "required": true}
+            },
+            "example": {
+                "timestamp": 12345678,
+                "authorization-token": "SomeAuthorizationToken",
+                "device-id": "XYZ-123-ABC"
+            }
+        },
+        "login-with-credentials": {
+            "description": "Login for a device with a credentialed user.",
+            "parameters": {
+                "timestamp": {"description": "UNIX timestamp.", "required": true},
+                "authorization-token": {"description": "A string used to validate permissions.", "required": true},
+                "device-id": {"description": "A string that uniquely identifies the mobile device.", "required": true},
+                "username": {"description": "Username for account to login to.", "required": true},
+                "password": {"description": "Password for account to login to.", "required": true},
+                "usage": {"description": "String outlining intended usage. If omitted, only device privileges are granted."}
+            },
+            "returns": {
+                "authorization-token": {"description":"A string used to validate permissions.", "required": true}
+            },
+            "example": {
+                "timestamp": 12345678,
+                "authorization-token": "SomeAuthorizationToken",
+                "device-id": "XYZ-123-ABC",
+                "username": "jsmith123",
+                "password": "MyBirthdayIsToday",
+                "usage": "account-settings"
+            }
+        },
+        "check-token": {
+            "description": "Verify privileges for a given authorization-token.",
+            "parameters": {
+                "timestamp": {"description": "UNIX timestamp.", "required": true},
+                "authorization-token": {"description": "A string used to validate permissions.", "required": true},
+                "device-id": {"description": "A string that uniquely identifies the mobile device.", "required": true},
+                "usage": {"description": "String outlining intended usage. If omitted, only device privileges are granted."}
+            },
+            "returns": [{
+                "granted": {"description":"A string with the granted privileges.('device', 'acount', and etc.)", "required": true}
+            }],
+            "example": {
+                "timestamp": 12345678,
+                "authorization-token": "SomeAuthorizationToken",
+                "device-id": "XYZ-123-ABC",
+                "usage": "account-settings"
+            }
+        }
+    }
+}
