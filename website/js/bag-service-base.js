@@ -143,20 +143,43 @@ let ServiceBase = function () {
         });
     };
 
-    _.api = function (onSuccess, baseUrl, apiSource) {
-        // convert the names into camel-case names (dashes are removed and the following character is uppercased)
-        let makeName = function (input) {
-            return input.replace (/-([^-])/g, function replacer (match, p1, offset, string) {
-                return p1.toUpperCase();
-            });
+    // convert the names into camel-case names (dashes are removed and the following character is uppercased)
+    let makeName = function (input) {
+        return input.replace (/-([^-])/g, function replacer (match, p1, offset, string) {
+            return p1.toUpperCase();
+        });
+    };
+
+    _.translateResponse = function (response) {
+        // internal function to copy the object as a response
+        let copyAsResponse = function (object) {
+            let copy = {};
+            let keys = Object.keys (object);
+            for (let key of keys) {
+                copy[makeName(key)] = object[key];
+            }
+            return copy;
         };
 
+        // make a decision based on the type
+        if (Array.isArray(response)) {
+            let copy = [];
+            for (let entry of response) {
+                copy.push (copyAsResponse(entry));
+            }
+            return copy;
+        } else {
+            return copyAsResponse(response);
+        }
+    };
+
+    _.api = function (onSuccess, baseUrl, apiSource) {
         // condition the inputs
         baseUrl = ((typeof baseUrl === "undefined") || (baseUrl === "")) ? location.href.substr(0,location.href.lastIndexOf("/")) : baseUrl;
         baseUrl = baseUrl.replace (/\/$/g, "");
 
         // get the api
-        let url = (typeof (apiSource) !== "undefined") ? apiSource : (baseUrl + "/api?event=help");
+        let url = ((typeof (apiSource) === "undefined") || (apiSource === "")) ? (baseUrl + "/api?event=help") : apiSource;
         _.get (url, function (db) {
             // if we retrieved the api.json from the service base, get the actual response
             if (typeof (apiSource) === "undefined") { db = db.response; }
@@ -192,7 +215,8 @@ let ServiceBase = function () {
                     functionParameters += ((first !== true) ? ", " : "") + "onSuccess";
                     functionBody += '    ServiceBase.get (url, function (response) {\n';
                     functionBody += '        if (response.status === "ok") {\n';
-                    functionBody += '            onSuccess (response.response);\n';
+                    functionBody += '            response = ServiceBase.translateResponse (response.response);\n';
+                    functionBody += '            onSuccess (response);\n';
                     functionBody += '        }\n';
                     functionBody += '    });\n';
                     functionParameters += ")";
