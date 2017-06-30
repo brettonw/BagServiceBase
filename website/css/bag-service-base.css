@@ -6,7 +6,7 @@ h2 { margin:10px 0px; }
 .container-div { border-radius:6px; border-width:1px; border-color:#ddd; border-style:solid; background:#fdfdfd; padding:5px 20px; }
 .description-div { margin-left:15px; }
 .events-div { margin-left:15px; }
-.event-div { vertical-align:top; border-radius:4px; border-width:1px; border-color:#ddd; border-style:solid; background:#fafafa; margin-bottom:6px; padding:8px 12px 10px 12px; }
+.event-div { vertical-align:top; border-radius:4px; border-width:1px; border-color:#ddd; border-style:solid; background:white; margin-bottom:6px; padding:8px 12px 10px 12px; }
 .event-name { font-weight:bold; font-size:18px; margin-bottom:6px; line-height:18px; vertical-align:top; }
 .even-odd-title { font-weight:bold; font-size:12px; margin-bottom:6px; margin-top:6px; line-height:12px; vertical-align:top; }
 .try-it { font-size:12px; font-weight:normal; text-decoration:none; float:right; line-height:12px; vertical-align:top; }
