@@ -18,8 +18,8 @@
 <script>
     ServiceBase.display ("service-base", "api.json");
 
-    ServiceBase.api ("", function (api) {
+    ServiceBase.api (function (api) {
         // does the api have a version call?
         console.log (("version" in api) ? "success" : "failure");
-    }, "api.json");
+    }, "", "api.json");
 </script>

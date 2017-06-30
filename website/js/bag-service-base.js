@@ -143,7 +143,7 @@ let ServiceBase = function () {
         });
     };
 
-    _.api = function (baseUrl, onSuccess, apiSource) {
+    _.api = function (onSuccess, baseUrl, apiSource) {
         // convert the names into camel-case names (dashes are removed and the following character is uppercased)
         let makeName = function (input) {
             return input.replace (/-([^-])/g, function replacer (match, p1, offset, string) {
@@ -152,6 +152,7 @@ let ServiceBase = function () {
         };
 
         // condition the inputs
+        baseUrl = (typeof baseUrl !== "undefined") ? baseUrl : "";
         baseUrl = baseUrl.replace (/\/$/g, "");
 
         // get the api
