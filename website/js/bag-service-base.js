@@ -152,7 +152,7 @@ let ServiceBase = function () {
         };
 
         // condition the inputs
-        baseUrl = (typeof baseUrl !== "undefined") ? baseUrl : "";
+        baseUrl = ((typeof baseUrl === "undefined") || (baseUrl === "")) ? location.href.substr(0,location.href.lastIndexOf("/")) : baseUrl;
         baseUrl = baseUrl.replace (/\/$/g, "");
 
         // get the api
