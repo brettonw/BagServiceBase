@@ -27,16 +27,23 @@ let ServiceBase = function () {
         return block ("a", { "class": cssClass, "href": href, "target": "_top" }, content);
     };
 
+    _.get = function (queryString, onSuccess) {
+        let request = new XMLHttpRequest ();
+        request.overrideMimeType ("application/json");
+        request.open ("GET", queryString, true);
+        request.onload = function (event) {
+            if (request.status === 200) {
+                let response = JSON.parse (this.responseText);
+                onSuccess (response);
+            }
+        };
+        request.send ();
+    };
+
     // a little black raincloud, of course
     _.display = function (displayInDivId, inputUrl) {
-        let request = new XMLHttpRequest ();
         let url = (typeof (inputUrl) !== "undefined") ? inputUrl : "api?event=help";
-        request.open ("GET", url, true);
-        request.overrideMimeType ("application/json");
-        request.onload = function () {
-            // parse the data
-            let db = JSON.parse (this.responseText);
-
+        _.get (url, function (db) {
             // if we retrieved the api.json from the service base, get the actual response
             if (typeof (inputUrl) === "undefined") { db = db.response; }
 
@@ -133,31 +140,28 @@ let ServiceBase = function () {
             innerHTML += div ("content-center footer", "Built with " + a ("footer-link", "http://bag-service-base.brettonw.com", "brettonw/BagServiceBase"));
 
             document.getElementById(displayInDivId).innerHTML = innerHTML;
-        };
-        request.send ();
+        });
     };
 
-    _.api = function (inputUrl, callback) {
+    _.api = function (baseUrl, onSuccess, apiSource) {
+        // convert the names into camel-case names (dashes are removed and the following character is uppercased)
         let makeName = function (input) {
             return input.replace (/-([^-])/g, function replacer (match, p1, offset, string) {
                 return p1.toUpperCase();
             });
         };
 
-        let request = new XMLHttpRequest ();
-        let url = (typeof (inputUrl) !== "undefined") ? inputUrl : "api?event=help";
-        request.open ("GET", url, true);
-        request.overrideMimeType ("application/json");
-        request.onload = function () {
-            // parse the data
-            let db = JSON.parse (this.responseText);
+        // condition the inputs
+        baseUrl = baseUrl.replace (/\/$/g, "");
 
+        // get the api
+        let url = (typeof (apiSource) !== "undefined") ? apiSource : (baseUrl + "api?event=help");
+        _.get (url, function (db) {
             // if we retrieved the api.json from the service base, get the actual response
-            if (typeof (inputUrl) === "undefined") { db = db.response; }
+            if (typeof (apiSource) === "undefined") { db = db.response; }
 
             // start with an empty build
             let api = Object.create (null);
-            let apiString = "";
 
             // check that we got a response with events
             if ("events" in db) {
@@ -166,45 +170,38 @@ let ServiceBase = function () {
                 for (let eventName of eventNames) {
                     let event = events[eventName];
 
-                    // convert the event name into a function name (dashes are removed and the
-                    // following character is uppercased)
-                    function replacer(match, p1, offset, string) {
-                        return p1.toUpperCase();
-                    }
+                    // set up the function name and an empty parameter list
                     let functionName = makeName (eventName);
                     let functionParameters = "(";
+                    let functionBody = '\tlet url = "' + baseUrl + '/api?event=' + eventName + '";\n';
 
                     // if there are parameters, add them
+                    let first = true;
                     if ("parameters" in event) {
-                        let first = true;
                         let names = Object.keys (event.parameters);
                         if (names.length > 0) {
                             for (let name of names) {
-                                let parameter = event.parameters[name];
-                                if (first === true) {
-                                    first = false;
-                                } else {
-                                    functionParameters += ", ";
-                                }
-                                functionParameters += makeName (name);
+                                let parameterName = makeName (name);
+                                functionParameters += ((first !== true) ? ", " : "") + parameterName;
+                                functionBody += '\turl += "' + name + '=" + ' + parameterName + ';\n';
+                                first = false;
                             }
                         }
                     }
+                    functionParameters += ((first !== true) ? ", " : "") + "onSuccess";
+                    functionBody += "\tServiceBase.get (url, onSuccess);\n";
                     functionParameters += ")";
 
-                    apiString += functionName + " " + functionParameters + ";\n";
+                    console.log (functionName + " " + functionParameters + ";\n");
 
-                    api[functionName] = new Function ("return function " + functionParameters + " {" +
-                            // need to add service base call of function from here
-                            "};") ();
+                    let functionString = "return function " + functionParameters + " {\n" +functionBody + "};\n";
+                    api[functionName] = new Function (functionString) ();
                 }
             }
-            console.log (apiString);
-            if (typeof callback !== "undefined") {
-                callback (api);
-            }
-        };
-        request.send ();
+
+            // call the completion routine
+            onSuccess (api);
+        });
     };
 
     return _;
