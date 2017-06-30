@@ -16,10 +16,13 @@
 
 <script src="../js/bag-service-base.js"></script>
 <script>
-    ServiceBase.display ("service-base", "api.json");
-
+    let myApi;
     ServiceBase.api (function (api) {
+        myApi = api;
+        let html = ServiceBase.displaySpecification(api.specification);
+        document.getElementById("service-base").innerHTML = html;
+
         // does the api have a version call?
-        console.log (("version" in api) ? "success" : "failure");
+        console.log (("version" in api) ? "has version" : "no version");
     }, "", "api.json");
 </script>
