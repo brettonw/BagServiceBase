@@ -156,7 +156,7 @@ let ServiceBase = function () {
         baseUrl = baseUrl.replace (/\/$/g, "");
 
         // get the api
-        let url = (typeof (apiSource) !== "undefined") ? apiSource : (baseUrl + "api?event=help");
+        let url = (typeof (apiSource) !== "undefined") ? apiSource : (baseUrl + "/api?event=help");
         _.get (url, function (db) {
             // if we retrieved the api.json from the service base, get the actual response
             if (typeof (apiSource) === "undefined") { db = db.response; }
